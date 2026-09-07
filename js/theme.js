@@ -1,0 +1,1 @@
+(function(){try{var t=localStorage.getItem("abyssalTheme");if(t!=="claro"&&t!=="escuro")t=matchMedia("(prefers-color-scheme: light)").matches?"claro":"escuro";document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=(t==="claro"?"light":"dark");}catch(e){}})();

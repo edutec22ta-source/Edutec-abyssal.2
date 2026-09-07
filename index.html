@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="ABYSSAL — atlas digital de biologia marinha, ecologia, oceanografia, espécies, ecossistemas e profundezas." name="description"/>
+<meta content="#041019" name="theme-color"/>
+<meta content="ABYSSAL — Marine Field Guide" property="og:title"/>
+<meta content="Explore o mundo que existe abaixo da superfície." property="og:description"/>
+<meta content="ABYSSAL" name="author"/>
+<link href="https://abyssal.example/" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="pt_BR" property="og:locale"/>
+<meta content="ABYSSAL" property="og:site_name"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="ABYSSAL — Guia de campo marinho" name="twitter:title"/>
+<meta content="Explore o mundo que existe abaixo da superfície." name="twitter:description"/>
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23041019'/%3E%3Cpath d='M4 20c4-5 9-7 14-5 3.5 1.4 5.6 3.6 9 4.7-2.1 1.1-4.5 1.3-6.6.4-1.4 2.9-4.7 4.5-8.4 4.1C8.8 23.9 6.4 22.6 4 20Z' fill='none' stroke='%237df2c8' stroke-width='1.8'/%3E%3Ccircle cx='20.5' cy='18' r='1' fill='%237df2c8'/%3E%3C/svg%3E" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<title>ABYSSAL — Guia de campo marinho</title>
+
+<link href="css/styles.css" rel="stylesheet"/></head>
+<body>
+<a class="skipLink" href="#app">Ir para o conteúdo</a>
+<div aria-hidden="true" class="ambient"><div class="amb amb-caustic"></div><div class="amb amb-isobath"></div><div class="amb amb-floor"></div><div class="amb amb-snow" id="marineSnow"></div></div>
+<svg aria-hidden="true" class="svgDefs" focusable="false" height="0" width="0"><defs><lineargradient id="sea" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#1b5664"></stop><stop offset="1" stop-color="#071d29"></stop></lineargradient><lineargradient id="fin" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#9ef7d3"></stop><stop offset="1" stop-color="#43cbdc"></stop></lineargradient><filter id="glow"><fegaussianblur result="b" stddeviation="3"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter></defs></svg>
+<header class="header">
+<div class="headerTop"><span>ABYSSAL · guia de campo marinho</span><span class="headerTopRight"><b>Zona</b> <i id="headerZone">epipelágica</i> · <b>Registro</b> 03°N 154°W</span></div>
+<div class="headerMain">
+<a class="brand" href="#/">ABYSSAL<span>MARINE FIELD GUIDE · 03°N 154°W</span></a>
+<nav class="mainNav" id="mainNav"></nav>
+<div class="headerTools">
+<label class="headerSearch"><span class="visuallyHidden">Pesquisar no atlas</span><svg aria-hidden="true" class="searchIcon" viewbox="0 0 20 20"><circle cx="9" cy="9" r="6"></circle><path d="M13.5 13.5 18 18"></path></svg><input id="headerSearchInput" onkeydown="if(event.key==='Enter')searchFromHeader(this.value)" placeholder="baleia, recife, 4.000 m…" type="search"/></label>
+<button aria-label="Alternar entre modo exploração e modo cientista" class="modeSwitch" id="modeSwitch" onclick="toggleMode()"><i aria-hidden="true"></i><b id="modeChipLabel">EXPLORAÇÃO</b></button><button aria-label="Alternar entre tema escuro e tema claro" class="themeSwitch" id="themeSwitch" onclick="toggleTheme()"><svg aria-hidden="true" class="moonIcon" viewbox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"></path></svg><svg aria-hidden="true" class="sunIcon" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.5 6.5 5 5M19 19l-1.5-1.5M17.5 6.5 19 5M5 19l1.5-1.5"></path></svg><b id="themeChipLabel">ESCURO</b></button><span class="depthChip"><i></i><b id="headerDepth">000 m</b></span>
+<button aria-controls="mega" aria-expanded="false" aria-label="Abrir menu" class="mobileBtn" id="megaBtn" onclick="toggleMega()"><span></span><span></span><span></span></button>
+</div>
+</div>
+<div class="headerSub" id="mega">
+<div class="megaGroup"><span>NAVEGAÇÃO</span><a href="#/">Home</a><a href="#/oceano">O Oceano</a><a href="#/zonas">Zonas de profundidade</a><a href="#/profundezas">Criaturas das profundezas</a><a href="#/jogo">Jogo de exploração</a></div>
+<div class="megaGroup"><span>VIDA</span><a href="#/especies">Enciclopédia de espécies</a><a href="#/ecologia">Ecologia marinha</a><a href="#/ecossistemas">Ecossistemas</a><a href="#/adaptacoes">Adaptações</a></div>
+<div class="megaGroup"><span>CIÊNCIA</span><a href="#/cadeia-alimentar">Teias alimentares</a><a href="#/exploracao">Exploração científica</a><a href="#/linha-do-tempo">Linha do tempo</a><a href="#/glossario">Glossário</a></div>
+<div class="megaGroup"><span>GUARDAR O OCEANO</span><a href="#/conservacao">Conservação</a><a href="#/recifes">Recifes</a><a href="#/fontes">Fontes</a><a href="#/sobre">Sobre o ABYSSAL</a></div>
+</div>
+</header>
+<div class="meterBar"><i id="scrollMeter"></i></div>
+<aside aria-hidden="true" class="depthRail"><span class="depthRailLabel">profundidade</span><div class="depthRailTrack"><i id="depthRailFill"></i><b id="depthRailDot"></b></div><div class="depthRailTicks"><span style="top:0%">0 m</span><span style="top:1.8%">200</span><span style="top:9%">1 km</span><span style="top:36%">4 km</span><span style="top:55%">6 km</span><span style="top:100%">11 km</span></div></aside>
+<main id="app" tabindex="-1"></main>
+<noscript><section class="section" style="padding-top:150px"><h1 class="display">ABYSSAL</h1><p class="lede">Este atlas de biologia marinha precisa de JavaScript para montar as fichas de espécies, o mapa das bacias e o simulador de ROV. Ative o JavaScript para explorar a coluna d\u2019água inteira, da zona iluminada às fossas hadais.</p><p class="lede">O conteúdo cobre: zonas de profundidade, enciclopédia de espécies, ecologia marinha, ecossistemas costeiros e profundos, adaptações, teias alimentares, conservação e história da exploração oceanográfica.</p></section></noscript>
+<footer class="foot"><div><div class="brand">ABYSSAL<span>MARINE FIELD GUIDE</span></div><p class="subtle">Explorando, documentando e compreendendo a vida nos oceanos.</p><p class="small">CONTEÚDO DESENVOLVIDO PARA FINS EDUCACIONAIS · FONTES INDICADAS NAS PÁGINAS</p></div><div class="footCols"><div><span class="small">EXPLORAR</span><a href="#/especies">Espécies</a><a href="#/ecologia">Ecologia</a><a href="#/ecossistemas">Ecossistemas</a><a href="#/profundezas">Profundezas</a><a href="#/jogo">Jogo</a></div><div><span class="small">APRENDER</span><a href="#/conservacao">Conservação</a><a href="#/exploracao">Exploração</a><a href="#/glossario">Glossário</a><a href="#/fontes">Fontes</a></div></div></footer>
+<button aria-label="Voltar ao topo" class="top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button><div class="toast" id="toast"></div>
+
+<script src="js/theme.js"></script><script src="js/data.js"></script><script src="js/core.js"></script><script src="js/visual.js"></script><script src="js/journal.js"></script><script src="js/map-hydrate.js"></script><script src="js/home.js"></script><script src="js/ocean.js"></script><script src="js/content-pages.js"></script><script src="js/deep-pages.js"></script><script src="js/game.js"></script><script src="js/app.js"></script></body></html>

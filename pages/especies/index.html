@@ -1,0 +1,50 @@
+<section class="pageHero"><div><span class="kicker">08 / ENCICLOPÉDIA</span><h1 class="display" style="margin-top:17px;font-size:clamp(3.2rem,6vw,7rem)">Espécies marinhas.</h1><p class="lede">Um catálogo de campo com 58 fichas, da superfície às fossas hadais. Pesquise por nome popular ou científico, grupo, ambiente, profundidade, alimentação ou estado de conservação.</p></div><div class="pageArt"><figure class="photoFrame big" data-photo="page-species" data-alt="Espécies marinhas."><div class="photoFallback"><svg class="svgArt large" viewBox="0 0 360 250" role="img" aria-label="ilustração de shark"><path d="M28 137c48-53 116-73 178-49l38 15 48-17 40 27-35 15 35 27-47-9c-26 35-72 52-121 46-50-6-90-24-136-55Z" fill="url(#sea)" stroke="#79f2fb" stroke-width="4"/><path d="M162 91l25-49 18 55M205 168l-2 31" fill="none" stroke="#79f2fb" stroke-width="6" stroke-linecap="round"/><path d="M293 126l27-10" stroke="#9ef7d3" stroke-width="5" stroke-linecap="round"/><circle cx="249" cy="106" r="5" fill="#9ef7d3"/></svg></div></figure></div></section>
+<section class="section">
+  <div class="eyebrowRow">
+    <div>
+      <span class="kicker">CATÁLOGO / 58 FICHAS</span>
+      <p class="subtle" style="margin:7px 0 0">Os filtros são combináveis. Cada ficha indica onde a espécie vive, em que profundidade, a qual ecossistema pertence e qual missão do simulador se relaciona a ela.</p>
+    </div>
+    <span class="speciesCount" id="speciesCount">58 espécies encontradas</span>
+  </div>
+  <div class="speciesFilters wide">
+    <label class="searchBox"><span class="kicker">Buscar</span><input id="speciesQuery" value="" oninput="renderSpecies()" placeholder="tubarão, Physeter, hadal, filtrador, ártico…"></label>
+    <label class="selectBox"><span class="kicker">Grupo</span><select id="speciesGroup" onchange="renderSpecies()"><option selected>Todos</option><option>Águas profundas</option><option>Algas e plantas marinhas</option><option>Aves marinhas</option><option>Cnidários</option><option>Crustáceos</option><option>Equinodermos</option><option>Mamíferos</option><option>Moluscos</option><option>Peixes</option><option>Plâncton e micro-organismos</option><option>Répteis</option></select></label>
+    <label class="selectBox"><span class="kicker">Profundidade</span><select id="speciesZone" onchange="renderSpecies()"><option value="Qualquer" selected>Qualquer</option><option value="epi">Epipelágica</option><option value="meso">Mesopelágica</option><option value="bati">Batipelágica</option><option value="abisso">Abissopelágica</option><option value="hadal">Hadopelágica</option></select></label>
+    <label class="selectBox"><span class="kicker">Ambiente</span><select id="speciesEco" onchange="renderSpecies()"><option value="Todos" selected>Todos</option><option value="reef">Recifes de coral</option><option value="mangrove">Manguezais</option><option value="kelp">Florestas de kelp</option><option value="open">Mar aberto</option><option value="seabed">Fundo oceânico</option><option value="vent">Fontes hidrotermais</option><option value="estuary">Estuários</option><option value="seagrass">Pradarias marinhas</option></select></label>
+    <label class="selectBox"><span class="kicker">Bacia</span><select id="speciesBasin" onchange="renderSpecies()"><option value="Todas" selected>Todas</option><option value="atlantico">Atlântico</option><option value="pacifico">Pacífico</option><option value="indico">Índico</option><option value="artico">Ártico</option><option value="antartico">Antártico</option></select></label>
+    <label class="selectBox"><span class="kicker">Conservação</span><select id="speciesStatus" onchange="renderSpecies()"><option value="Todos" selected>Todos</option><option value="ameacada">Ameaçada (CR/EN/VU)</option><option value="atencao">Quase ameaçada</option><option value="estavel">Pouco preocupante</option><option value="indefinido">Sem avaliação suficiente</option></select></label>
+    <label class="selectBox"><span class="kicker">Ordenar por</span><select id="speciesSort" onchange="renderSpecies()"><option value="nome" selected>Nome</option><option value="profundidade">Profundidade (rasa → funda)</option><option value="profundidadeDesc">Profundidade (funda → rasa)</option><option value="grupo">Grupo</option><option value="status">Estado de conservação</option></select></label>
+  </div>
+  <div id="speciesChips"></div>
+  <div id="speciesGrid" class="speciesGrid fieldGrid"></div>
+  <p class="small sourceNote">Cada ficha indica sua fonte principal. Categorias de conservação seguem a Lista Vermelha da IUCN e podem mudar entre avaliações e entre populações.</p>
+  
+  <div class="modeStrip"><span class="kicker">Modo de leitura</span><div class="modeCards" role="group" aria-label="Modo de leitura">
+    <button class="modeCard active" data-mode-btn="explorador" aria-pressed="true" onclick="setMode('explorador')">
+      <span class="modeCardTop"><b>Exploração</b><i aria-hidden="true"></i></span>
+      <span class="modeCardLead">Você percorre o atlas pela imagem e pela narrativa.</span>
+      <ul><li>Fichas ilustradas com fotografia grande</li><li>Uma curiosidade em destaque por espécie</li><li>Convites para o mapa, o jogo e o diário</li></ul>
+    </button><button class="modeCard" data-mode-btn="cientista" aria-pressed="false" onclick="setMode('cientista')">
+      <span class="modeCardTop"><b>Cientista</b><i aria-hidden="true"></i></span>
+      <span class="modeCardLead">Você percorre o atlas pelos números e pelas fontes.</span>
+      <ul><li>Catálogo em tabela ordenável, com faixa em metros</li><li>Código IUCN, bacias e fonte em cada linha</li><li>Notas de método e ressalvas de incerteza</li></ul>
+    </button>
+  </div></div>
+</section>
+<div class="modeStrip section" style="padding-top:0"><span class="kicker">Modo de leitura</span><div class="modeCards" role="group" aria-label="Modo de leitura">
+    <button class="modeCard active" data-mode-btn="explorador" aria-pressed="true" onclick="setMode('explorador')">
+      <span class="modeCardTop"><b>Exploração</b><i aria-hidden="true"></i></span>
+      <span class="modeCardLead">Você percorre o atlas pela imagem e pela narrativa.</span>
+      <ul><li>Fichas ilustradas com fotografia grande</li><li>Uma curiosidade em destaque por espécie</li><li>Convites para o mapa, o jogo e o diário</li></ul>
+    </button><button class="modeCard" data-mode-btn="cientista" aria-pressed="false" onclick="setMode('cientista')">
+      <span class="modeCardTop"><b>Cientista</b><i aria-hidden="true"></i></span>
+      <span class="modeCardLead">Você percorre o atlas pelos números e pelas fontes.</span>
+      <ul><li>Catálogo em tabela ordenável, com faixa em metros</li><li>Código IUCN, bacias e fonte em cada linha</li><li>Notas de método e ressalvas de incerteza</li></ul>
+    </button>
+  </div></div>
+
+<nav class="flowTrail" aria-label="Fluxo de exploração do atlas">
+    <span class="kicker">Trilha do atlas</span>
+    <ol><li class=""><a href="#/oceano">O oceano</a></li><li class=""><a href="#/mapa">Mapa</a></li><li class=""><a href="#/ecossistemas">Ecossistema</a></li><li class="here"><a href="#/especies">Espécie</a></li><li class=""><a href="#/zonas">Profundidade</a></li><li class=""><a href="#/jogo">Jogo</a></li><li class=""><a href="#/diario">Diário</a></li></ol>
+  </nav>
