@@ -1468,3 +1468,12 @@ html[data-theme="claro"] .themeSwitch .moonIcon{display:none}
 .techVisual .photoFrame[data-photo="tech-sub"] img{object-position:50% 50%}
 .techVisual .photoFrame[data-photo="tech-ctd"] img{object-position:50% 50%}
 .techVisual .photoFrame[data-photo="tech-edna"] img{object-position:50% 50%}
+
+/* ---------- conquistas do diário ---------- */
+.achGroup{margin-bottom:22px}
+.achGroup:last-child{margin-bottom:0}
+.achGroupName{display:block;font:600 9px ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--md6);margin-bottom:10px}
+.badge{opacity:.55;transition:opacity .2s,border-color .2s}
+.badge.badgeOn{opacity:1;border-color:rgba(var(--ac10-rgb),.45);background:linear-gradient(180deg,rgba(var(--ac10-rgb),.09),var(--sf20))}
+.badge.badgeOn strong{color:var(--bio)}
+@media (max-width:640px){.badgeGrid{grid-template-columns:1fr}}

@@ -12,7 +12,7 @@ const SAMPLE_LABELS={
 };
 const PHASES=[
 {id:'F01',name:'Recife da plataforma',zone:'Epipelágica',depthLabel:'0 – 180 m',
- target:180,returnDepth:45,sonarDepth:60,energy:100,light:1,pulses:99,
+ target:180,returnDepth:45,sonarDepth:60,energy:100,light:1,pulses:99,echo:9,
  terrain:'reef',current:0,pressure:0,hazard:null,
  samples:['CORAL','CTD','IMAGEM','eDNA'],
  brief:'Mergulho de treinamento sobre o recife. Colete as quatro amostras e retorne acima de 45 m.',
@@ -20,7 +20,7 @@ const PHASES=[
  sky:['#0e7c86','#0a5b6b','#074454','#06303e'],floor:'#0a3b3a'},
 
 {id:'F02',name:'Zona crepuscular',zone:'Mesopelágica',depthLabel:'200 – 1.000 m',
- target:1000,returnDepth:250,sonarDepth:520,energy:96,light:.46,pulses:8,
+ target:1000,returnDepth:250,sonarDepth:520,energy:96,light:.46,pulses:8,echo:7,
  terrain:'openwater',current:.32,pressure:0,hazard:'jelly',
  samples:['PLANCTON','BIOLUZ','eDNA','CTD','IMAGEM'],
  brief:'A luz acaba. Desça até 1.000 m, use o sonar abaixo de 520 m e recupere cinco amostras.',
@@ -28,7 +28,7 @@ const PHASES=[
  sky:['#0a4a5c','#073241','#05202c','#03151d'],floor:'#04202a'},
 
 {id:'F03',name:'Cânion submarino',zone:'Batipelágica',depthLabel:'0 – 1.800 m',
- target:1800,returnDepth:400,sonarDepth:900,energy:92,light:.34,pulses:5,
+ target:1800,returnDepth:400,sonarDepth:900,energy:92,light:.34,pulses:5,echo:6,
  terrain:'canyon',current:.85,pressure:0,hazard:null,corridor:{freq:.011,amp:250,gap0:150,gapAmp:26,gapFreq:.017},
  samples:['RELEVO','SEDIMENTO','RELEVO','IMAGEM'],
  brief:'Corredor estreito com correnteza lateral. Siga o cânion até 1.800 m e mapeie quatro pontos.',
@@ -36,7 +36,7 @@ const PHASES=[
  sky:['#08404f','#062c39','#041c26','#020f16'],floor:'#062028'},
 
 {id:'F04',name:'Campo hidrotermal',zone:'Batipelágica',depthLabel:'2.500 m',
- target:2500,returnDepth:600,sonarDepth:1900,energy:88,light:.30,pulses:6,
+ target:2500,returnDepth:600,sonarDepth:1900,energy:88,light:.30,pulses:6,echo:7,
  terrain:'vents',current:.2,pressure:0,hazard:'plume',
  samples:['VENT','VENT','eDNA','CTD','FAUNA'],
  brief:'Chaminés ativas expelem fluido superaquecido. Colete cinco amostras sem atravessar as plumas.',
@@ -44,7 +44,7 @@ const PHASES=[
  sky:['#073744','#052733','#031a24','#010e14'],floor:'#0a1f22'},
 
 {id:'F05',name:'Planície abissal',zone:'Abissopelágica',depthLabel:'4.200 m',
- target:4200,returnDepth:800,sonarDepth:3400,energy:78,light:.22,pulses:5,
+ target:4200,returnDepth:800,sonarDepth:3400,energy:78,light:.22,pulses:5,echo:7,
  terrain:'plain',current:.15,pressure:.007,hazard:null,
  samples:['SEDIMENTO','FAUNA','eDNA','RELEVO','IMAGEM','CTD'],
  brief:'Bateria curta, alvos espalhados. Planeje a rota: seis amostras com 74% de energia.',
@@ -52,12 +52,49 @@ const PHASES=[
  sky:['#052b38','#031d27','#02131b','#01090e'],floor:'#0c1a1e'},
 
 {id:'F06',name:'Fossa hadal',zone:'Hadopelágica',depthLabel:'7.800 m',
- target:7800,returnDepth:1200,sonarDepth:6500,energy:82,light:.16,pulses:4,
+ target:7800,returnDepth:1200,sonarDepth:6500,energy:82,light:.16,pulses:4,echo:4,
  terrain:'trench',current:1.25,pressure:.011,hazard:'jelly',corridor:{freq:.008,amp:180,gap0:120,gapAmp:22,gapFreq:.023},
  samples:['FAUNA','SEDIMENTO','eDNA','BIOLUZ','CTD'],
  brief:'Pressão extrema, correnteza forte e só três pulsos de sonar. Última descida.',
  lesson:'Abaixo de 6.000 m a pressão passa de 600 atmosferas e a fauna é altamente especializada.',
- sky:['#04222d','#03161f','#010c12','#000508'],floor:'#0a1418'}
+ sky:['#04222d','#03161f','#010c12','#000508'],floor:'#0a1418'},
+
+/* ---------- expedições especiais ----------
+   Liberadas depois de percorrer a coluna d'água inteira. Cada uma trata
+   de um ambiente oceânico real que as seis primeiras não cobrem, com
+   margem de energia e de sonar mais apertada. */
+
+{id:'F07',name:'Monte submarino',zone:'Batipelágica',depthLabel:'1.500 m',
+ target:1500,returnDepth:350,sonarDepth:760,energy:80,light:.32,pulses:4,echo:5,
+ terrain:'canyon',current:1.05,pressure:0,hazard:null,corridor:{freq:.013,amp:210,gap0:142,gapAmp:24,gapFreq:.019},
+ samples:['RELEVO','CORAL','FAUNA','eDNA','CTD','IMAGEM'],
+ brief:'O monte desvia a corrente e a acelera nos flancos. Contorne a encosta até 1.500 m e recolha seis amostras.',
+ lesson:'Montes submarinos desviam correntes profundas para cima, trazendo nutrientes e concentrando vida numa área pequena.',
+ sky:['#08414e','#052b38','#031b25','#020e15'],floor:'#093034'},
+
+{id:'F08',name:'Mínimo de oxigênio',zone:'Mesopelágica',depthLabel:'900 m',
+ target:900,returnDepth:220,sonarDepth:520,energy:74,light:.24,pulses:3,echo:8,
+ terrain:'openwater',current:.5,pressure:.010,hazard:'jelly',
+ samples:['CTD','PLANCTON','eDNA','BIOLUZ','IMAGEM','FAUNA'],
+ brief:'Camada pobre em oxigênio: os sensores gastam mais e há só três pulsos. Seis amostras, margem curta.',
+ lesson:'Em algumas regiões o oxigênio quase desaparece entre 200 e 1.000 m; poucos organismos, altamente especializados, permanecem ali.',
+ sky:['#06323f','#04222d','#03161e','#010b10'],floor:'#03171f'},
+
+{id:'F09',name:'Queda de baleia',zone:'Abissopelágica',depthLabel:'3.400 m',
+ target:3400,returnDepth:700,sonarDepth:2700,energy:72,light:.20,pulses:4,echo:7,
+ terrain:'plain',current:.25,pressure:.006,hazard:null,
+ samples:['FAUNA','SEDIMENTO','eDNA','IMAGEM','CTD','RELEVO','BIOLUZ'],
+ brief:'Uma carcaça no fundo sustenta uma comunidade inteira. Sete amostras espalhadas, 72% de energia.',
+ lesson:'A carcaça de um grande cetáceo alimenta sucessões de organismos no fundo abissal por décadas.',
+ sky:['#052833','#031a23','#021119','#01080c'],floor:'#0b181c'},
+
+{id:'F10',name:'Fossa Challenger',zone:'Hadopelágica',depthLabel:'10.900 m',
+ target:10900,returnDepth:1500,sonarDepth:9000,energy:76,light:.13,pulses:3,echo:4,
+ terrain:'trench',current:1.45,pressure:.013,hazard:'jelly',corridor:{freq:.0075,amp:165,gap0:126,gapAmp:20,gapFreq:.021},
+ samples:['FAUNA','SEDIMENTO','eDNA','CTD','RELEVO','BIOLUZ'],
+ brief:'O ponto mais profundo conhecido do oceano. Corrente máxima, três pulsos, sem margem para erro.',
+ lesson:'O fundo da Fossa das Marianas fica por volta de 10.900 m: mais de mil atmosferas de pressão.',
+ sky:['#031c26','#02121a','#01090e','#000305'],floor:'#081116'}
 ];
 activeMission=PHASES[0];
 
@@ -69,6 +106,41 @@ function phaseDone(i){return getLog().missions.includes(PHASES[i].id)}
 function corridorAt(y){const c=activeMission.corridor;if(!c)return null;const cx=600+Math.sin(y*c.freq)*c.amp;const g=c.gap0+Math.sin(y*c.gapFreq)*c.gapAmp;return[cx-g,cx+g,cx]}
 function depthToY(m){return CANVAS_TOP+(m/activeMission.target)*(CANVAS_BOT-CANVAS_TOP)}
 function yToDepth(y){return Math.max(0,Math.round((y-CANVAS_TOP)/(CANVAS_BOT-CANVAS_TOP)*activeMission.target))}
+
+/* ---------- garantia de passagem ----------
+   Nas fases de corredor (F03 cânion, F06 fossa) as rochas eram sorteadas
+   em torno do eixo do corredor, sem verificar se sobrava faixa navegável.
+   Duas rochas próximas fechavam a passagem por completo e a fase virava
+   impossível: o espaço alcançável terminava em 926 m na F03 e em 2.451 m
+   na F06, muito antes do alvo.
+
+   Agora cada rocha é encostada na parede mais próxima e, se ainda assim a
+   faixa livre ficar menor que LANE_MIN, o raio da rocha é reduzido. Isso
+   preserva o desenho do cânion e a dificuldade, garantindo que sempre
+   exista rota. */
+const ROV_R=22, LANE_MIN=110;
+function corridorBounds(ph,y){
+  const c=ph.corridor; if(!c)return null;
+  const cx=600+Math.sin(y*c.freq)*c.amp, g=c.gap0+Math.sin(y*c.gapFreq)*c.gapAmp;
+  return [cx-g,cx+g,cx];
+}
+function ensurePassable(ph,rocks){
+  if(!ph.corridor)return rocks;
+  rocks.sort((a,b)=>a.y-b.y);
+  let ladoAnterior=0, yAnterior=-1e9;
+  for(const r of rocks){
+    const b=corridorBounds(ph,r.y), largura=b[1]-b[0];
+    const raioMax=Math.max(8,(largura-2*ROV_R-LANE_MIN)/2);
+    if(r.r>raioMax)r.r=raioMax;
+    let lado = r.x<b[2] ? -1 : 1;
+    /* rochas verticalmente próximas vão para a MESMA parede: em paredes
+       opostas elas estreitariam o vão central a poucos pixels */
+    if(r.y-yAnterior < 130) lado = ladoAnterior || lado;
+    r.x = lado<0 ? b[0]+r.r : b[1]-r.r;
+    ladoAnterior=lado; yAnterior=r.y;
+  }
+  return rocks;
+}
 
 /* ---------- geração do mundo, específica por terreno ---------- */
 function buildWorld(ph){
@@ -102,27 +174,53 @@ function buildWorld(ph){
     for(let i=0;i<7;i++){const y=180+R()*380,b=corridorAt(y);hazards.push({x:b[2]+(R()-.5)*120,y,r:24,dmg:.30,kind:'jelly',ph:R()*6,vy:.18,vx:(R()>.5?1:-1)*.2})}
     for(let i=0;i<8;i++){const y=150+R()*420,b=corridorAt(y);fauna.push({x:b[2]+(R()-.5)*140,y,v:(R()>.5?1:-1)*.25,s:5+R()*4,kind:'amphipod'})}
   }
-  return {rocks,hazards,fauna,props};
+  return {rocks:ensurePassable(ph,rocks),hazards,fauna,props};
 }
 function placeSamples(ph,world){
+  /* Distribuição das amostras.
+     Antes eram sorteadas quase livremente e frequentemente caíam
+     próximas umas das outras — dava para recolher várias sem navegar.
+     Agora cada amostra ocupa uma faixa de profundidade própria e precisa
+     respeitar uma distância mínima das demais. A separação alvo sai da
+     área útil do terreno e só é afrouxada se o espaço não comportar,
+     de modo que a fase nunca fica impossível de montar. */
   const R=seedRand(ph.target+ph.samples.length*13),out=[];
-  const yMin=Math.min(CANVAS_BOT-70,depthToY(ph.sonarDepth)+26),yMax=CANVAS_BOT-22;
+  /* A faixa onde as amostras podem nascer começa abaixo da profundidade
+     do sonar. Em fases cujo sonar libera muito fundo (F05, F06, F09, F10)
+     isso reduzia a faixa a menos de 70px de altura e empilhava todas as
+     amostras no rodapé — o que tornava a coleta trivial. Agora a faixa
+     tem altura mínima garantida, então a rota cobre a coluna de verdade. */
+  const yMax=CANVAS_BOT-22, alturaMin=.58*(CANVAS_BOT-CANVAS_TOP);
+  const yMin=Math.max(CANVAS_TOP+30,Math.min(depthToY(ph.sonarDepth)+26,yMax-alturaMin));
+  const n=ph.samples.length, faixa=yMax-yMin;
+  const larguraUtil=ph.corridor?250:1060;
+  let sep=Math.min(340,Math.sqrt(Math.max(1,larguraUtil*faixa)/n)*0.95);
   ph.samples.forEach((type,i)=>{
-    let x,y,tries=0;
-    const band=(i+.5)/ph.samples.length;
+    let x=600,y=(yMin+yMax)/2,tentativas=0,ok=false;
+    const banda=(i+.5)/n;
     do{
-      y=yMin+(yMax-yMin)*(ph.corridor?band:(0.15+R()*0.8));
-      if(ph.corridor){const b=corridorAt(y);x=b[2]+(R()-.5)*(b[1]-b[0]-90)}
-      else if(ph.terrain==='openwater'){x=90+R()*1020}
-      else{x=90+band*980+(R()-.5)*(150+tries*22)}
+      const desvio=(R()-.5)*(0.9/n);
+      const t=Math.max(0,Math.min(1,banda+desvio));
+      y=yMin+faixa*t;
+      if(ph.corridor){
+        const b=corridorAt(y);
+        x=b[2]+(R()-.5)*Math.max(40,(b[1]-b[0])-110);
+      }else{
+        x=90+R()*1020;
+      }
       x=Math.max(70,Math.min(1130,x));
-      tries++;
-    }while(tries<50&&world.rocks.some(r=>Math.hypot(x-r.x,y-r.y)<r.r+42));
+      const distante=out.every(o=>Math.hypot(x-o.px,y-o.py)>=sep);
+      const desimpedida=!world.rocks.some(r=>Math.hypot(x-r.x,y-r.y)<r.r+42);
+      ok=distante&&desimpedida;
+      tentativas++;
+      if(tentativas%40===0)sep*=.85;   /* afrouxa aos poucos se não couber */
+    }while(!ok&&tentativas<400);
     out.push({type,id:type,label:SAMPLE_LABELS[type]||'amostra',
       px:Math.max(60,Math.min(1140,x)),py:Math.max(90,Math.min(CANVAS_BOT-18,y)),got:false,pulse:0});
   });
   return out;
 }
+
 
 function selectPhase(i){
   i=Math.max(0,Math.min(PHASES.length-1,Number(i)||0));
@@ -219,6 +317,12 @@ function finishROV(force=false){
   const ok=rovState.data>=rovState.goal&&rovState.depth<rovState.returnDepth;
   if(!ok)return;
   rovState.running=false;rovState.won=true;markMission(activeMission.id);
+  /* conquistas: contabiliza o desempenho desta descida */
+  if(typeof registrarMissao==='function'){
+    registrarMissao({amostras:rovState.data,profMax:rovState.maxDepth,energia:rovState.energy,
+      colisoes:rovState.hit,pulsosUsados:activeMission.pulses-rovState.pulsesLeft});
+    checkAchievements();
+  }
   if(rovFrame){cancelAnimationFrame(rovFrame);rovFrame=null}
   const i=phaseIndex(),next=PHASES[i+1];
   const hint=document.getElementById('gameHint');
@@ -239,15 +343,27 @@ function updateROV(){
   if(!dx&&!dy)rovState.energy=Math.min(100,rovState.energy+.012);
   const boost=k.shift?1.6:1,speed=2.3*boost;
   if(dx&&dy){dx*=.72;dy*=.72}
-  rovState.drift=ph.current?Math.sin(rovState.time*.7)*ph.current+Math.sin(rovState.time*.23)*ph.current*.6:0;
+  /* a deriva nunca pode superar o propulsor, senão o ROV fica preso
+     contra a parede sem conseguir avançar */
+  const derivaMax=2.3*.8;
+  let deriva=ph.current?Math.sin(rovState.time*.7)*ph.current+Math.sin(rovState.time*.23)*ph.current*.6:0;
+  rovState.drift=Math.max(-derivaMax,Math.min(derivaMax,deriva));
   const nx=Math.max(30,Math.min(1170,rovState.x+dx*speed+rovState.drift));
   const ny=Math.max(CANVAS_TOP,Math.min(CANVAS_BOT,rovState.y+dy*speed));
-  let blocked=false;
-  const bnd=corridorAt(ny);
-  if(bnd&&(nx<bnd[0]+22||nx>bnd[1]-22))blocked=true;
-  if(!blocked)for(const r of rovState.rocks){if(Math.hypot(nx-r.x,ny-r.y)<r.r+22){blocked=true;break}}
-  if(!blocked){rovState.x=nx;rovState.y=ny}
-  else{rovState.hit++;rovState.energy=Math.max(0,rovState.energy-(k.shift?.14:.06));rovState.alarm=12}
+  /* colisão testada eixo a eixo: encostar na parede deixa de travar o
+     movimento inteiro, o ROV desliza pela parede e continua descendo.
+     Antes, um único eixo bloqueado cancelava também o outro — com a
+     correnteza empurrando de lado, isso prendia o veículo no lugar. */
+  const livre=(px,py)=>{
+    const b=corridorAt(py);
+    if(b&&(px<b[0]+ROV_R||px>b[1]-ROV_R))return false;
+    for(const r of rovState.rocks)if(Math.hypot(px-r.x,py-r.y)<r.r+ROV_R)return false;
+    return true;
+  };
+  let bateu=false;
+  if(livre(nx,rovState.y))rovState.x=nx; else bateu=true;
+  if(livre(rovState.x,ny))rovState.y=ny; else bateu=true;
+  if(bateu){rovState.hit++;rovState.energy=Math.max(0,rovState.energy-(k.shift?.14:.06));rovState.alarm=12}
   rovState.depth=yToDepth(rovState.y);
   rovState.maxDepth=Math.max(rovState.maxDepth,rovState.depth);
   rovState.energy=Math.max(0,rovState.energy-(Math.abs(dx)+Math.abs(dy))*(k.shift?.046:.019));
@@ -265,11 +381,20 @@ function updateROV(){
     }
   }
   rovState.sonarUnlocked=rovState.depth>=ph.sonarDepth;
+  /* O eco do sonar tem prazo. Antes, uma amostra revelada ficava marcada
+     para sempre e bastava ir buscando com calma. Agora o marcador expira
+     depois de ph.echo segundos e some da tela: ou você chega a tempo, ou
+     memoriza a posição, ou gasta outro pulso. A amostra em si continua
+     onde está — `vista` nunca é revogada — então a fase jamais trava por
+     falta de pulsos. */
   for(const it of rovState.items){
     if(it.got)continue;
     const dist=Math.hypot(rovState.x-it.px,rovState.y-it.py);
-    if(rovState.sonar>0&&dist<430)it.discovered=true;
-    if(it.discovered&&dist<48){
+    if(rovState.sonar>0&&dist<430){it.vista=true;it.ecoAte=rovState.time+(ph.echo||10)}
+    /* contato visual: os faróis do ROV revelam o que passa bem ao lado,
+       garantindo uma saída mesmo sem nenhum pulso sobrando */
+    else if(!it.vista&&dist<80){it.vista=true;it.ecoAte=rovState.time+(ph.echo||10)}
+    if(it.vista&&dist<48){
       it.got=true;it.pulse=1;rovState.data++;rovState.energy=Math.min(100,rovState.energy+6);
       toast('Amostra '+it.id+' recuperada');
     }
@@ -317,7 +442,7 @@ function updateGameUI(){
   set('missionStep3Text','Volte para menos de '+ph.returnDepth+' m.');
   set('sonarStatus',rovState.sonar>0?'Pulso ativo':rovState.sonarUnlocked?(rovState.pulsesLeft>0?'Pronto':'Sem pulsos'):'Bloqueado');
   set('sonarText',rovState.sonar>0?'Alvos próximos destacados no campo visual.'
-    :rovState.sonarUnlocked?(rovState.pulsesLeft>0?'Espaço emite um pulso: o eco marca os alvos num raio de 430 m. Depois basta chegar perto.':'Os pulsos acabaram. Reinicie a fase.')
+    :rovState.sonarUnlocked?(rovState.pulsesLeft>0?'Espaço emite um pulso: o eco marca os alvos num raio de 430 m e apaga em '+(activeMission.echo||10)+' s. Chegue antes ou decore a posição.':'Os pulsos acabaram. Reinicie a fase.')
     :'O sonar só responde abaixo de '+ph.sonarDepth.toLocaleString('pt-BR')+' m.');
   const state=document.getElementById('gameState');
   if(state&&rovState.running)state.textContent=`Sistema · ${rovState.phase.toLowerCase()} · ${ph.zone.toLowerCase()}${rovState.drift?' · correnteza '+(rovState.drift>0?'leste':'oeste'):''}`;
@@ -450,8 +575,11 @@ function drawROV(){
   for(const it of rovState.items){
     if(it.got)continue;
     const live=rovState.sonar>0&&rovState.sonarUnlocked;
-    if(!it.discovered&&!live)continue;
-    const a=live?1:.5;
+    /* eco restante: o marcador esmaece no fim e pisca no último segundo */
+    const eco=(it.ecoAte||0)-rovState.time;
+    if(!live&&eco<=0)continue;
+    let a=live?1:Math.max(.12,Math.min(.55,eco/3));
+    if(!live&&eco<1.2&&Math.floor(rovState.time*8)%2===0)a*=.35;
     x.save();x.globalAlpha=a;
     x.strokeStyle='rgba(158,247,211,.8)';x.setLineDash([4,5]);x.lineWidth=2;
     x.beginPath();x.arc(it.px,it.py,18+Math.sin((rovState.bubble+it.px)*.1)*3,0,6.3);x.stroke();x.setLineDash([]);
