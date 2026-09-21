@@ -35,3 +35,7 @@ A aparência e as funcionalidades do site foram preservadas, mas o código foi s
 ## Como rodar
 
 Abra esta pasta no VS Code. Instale a extensão `Live Server`, clique com o botão direito em `index.html` e escolha `Open with Live Server`.
+
+
+### Imagens reais
+As imagens principais do atlas usam fotografias reais carregadas da Wikipedia/Wikimedia em tempo de execução; mantenha conexão com a internet ao testar o site.

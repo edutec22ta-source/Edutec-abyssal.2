@@ -23,211 +23,189 @@ function statusInfo(st){const s=slug(st||'');if(/criticamente|em perigo critico/
 function statusChip(st){const[c,full,cls]=statusInfo(st);return `<span class="iucn iucn-${cls}"><b>${c}</b><span>${esc(full)}</span></span>`}
 function catalogo(s){const i=SPECIES.indexOf(s);return 'ABY-'+String((i<0?0:i)+1).padStart(3,'0')}
 
-/* ================= FOTOGRAFIAS REAIS =================
-   As imagens vêm da Wikipédia/Wikimedia Commons em tempo de execução,
-   com crédito e licença de cada autor.
-
-   Cada chave tem uma lista de candidatos em ordem de preferência, no
-   formato 'idioma:Título'. A busca tenta o artigo em português, depois
-   o nome comum em inglês e, por último, o nome científico — que quase
-   sempre existe como artigo ou redirecionamento.
-
-   A API da MediaWiki aceita no máximo 50 títulos por requisição, por
-   isso os pedidos são divididos em blocos. Se a rede falhar, a
-   ilustração vetorial permanece como reserva. */
-const WIKI_TITLES={
-  'tubarao-branco':['pt:Tubarão-branco','en:Great white shark','en:Carcharodon carcharias'],
-  'orca':['pt:Orca','en:Orca','en:Orcinus orca'],
-  'baleia-azul':['pt:Baleia-azul','en:Blue whale','en:Balaenoptera musculus'],
-  'lula-gigante':['pt:Lula-gigante','en:Giant squid','en:Architeuthis'],
-  'polvo-comum':['pt:Polvo-comum','en:Common octopus','en:Octopus vulgaris'],
-  'cavalo-marinho':['pt:Cavalo-marinho','en:Seahorse','en:Hippocampus (genus)'],
-  'tartaruga-verde':['pt:Tartaruga-verde','en:Green sea turtle','en:Chelonia mydas'],
-  'peixe-lua':['pt:Mola mola','en:Ocean sunfish','en:Mola mola'],
-  'narval':['pt:Narval','en:Narwhal','en:Monodon monoceros'],
-  'peixe-pescador':['en:Humpback anglerfish','en:Melanocetus johnsonii','en:Anglerfish'],
-  'caranguejo-yeti':['en:Kiwa hirsuta','en:Yeti crab','pt:Kiwa hirsuta'],
-  'agua-viva-juba-de-leao':["en:Lion's mane jellyfish",'en:Cyanea capillata','pt:Cyanea capillata'],
-  'tubarao-baleia':['pt:Tubarão-baleia','en:Whale shark','en:Rhincodon typus'],
-  'tubarao-martelo':['en:Scalloped hammerhead','en:Sphyrna lewini','pt:Tubarão-martelo'],
-  'tubarao-mako':['en:Shortfin mako shark','en:Isurus oxyrinchus','pt:Tubarão-anequim'],
-  'tubarao-groenlandia':['en:Greenland shark','en:Somniosus microcephalus','pt:Tubarão-da-gronelândia'],
-  'raia-manta':['en:Giant oceanic manta ray','en:Mobula birostris','pt:Manta birostris'],
-  'enguia-lobo':['en:Wolf eel','en:Anarrhichthys ocellatus'],
-  'peixe-palhaco':['en:Ocellaris clownfish','en:Amphiprion ocellaris','pt:Peixe-palhaço'],
-  'bodiao-limpador':['en:Bluestreak cleaner wrasse','en:Labroides dimidiatus'],
-  'atum-rabilho':['en:Atlantic bluefin tuna','en:Thunnus thynnus','pt:Atum-rabilho'],
-  'sardinha-verdadeira':['en:Sardinella brasiliensis','en:Sardinella','pt:Sardinella brasiliensis'],
-  'mero':['en:Atlantic goliath grouper','en:Epinephelus itajara','pt:Mero'],
-  'peixe-voador':['en:Flying fish','en:Exocoetidae','pt:Peixe-voador'],
-  'celacanto':['en:West Indian Ocean coelacanth','en:Latimeria chalumnae','pt:Celacanto'],
-  'peixe-lanterna':['en:Lanternfish','en:Myctophidae'],
-  'caracol-do-mar-hadal':['en:Mariana snailfish','en:Pseudoliparis swirei','en:Snailfish'],
-  'baleia-jubarte':['pt:Baleia-jubarte','en:Humpback whale','en:Megaptera novaeangliae'],
-  'cachalote':['pt:Cachalote','en:Sperm whale','en:Physeter macrocephalus'],
-  'golfinho-nariz-de-garrafa':['en:Common bottlenose dolphin','en:Tursiops truncatus','pt:Golfinho-nariz-de-garrafa'],
-  'foca-de-weddell':['en:Weddell seal','en:Leptonychotes weddellii','pt:Foca-de-weddell'],
-  'morsa':['pt:Morsa','en:Walrus','en:Odobenus rosmarus'],
-  'tartaruga-de-couro':['pt:Tartaruga-de-couro','en:Leatherback sea turtle','en:Dermochelys coriacea'],
-  'tartaruga-de-pente':['pt:Tartaruga-de-pente','en:Hawksbill sea turtle','en:Eretmochelys imbricata'],
-  'pinguim-imperador':['pt:Pinguim-imperador','en:Emperor penguin','en:Aptenodytes forsteri'],
-  'albatroz-errante':['en:Wandering albatross','en:Diomedea exulans','pt:Albatroz-errante'],
-  'lula-colossal':['en:Colossal squid','en:Mesonychoteuthis hamiltoni','pt:Lula-colossal'],
-  'nautilo':['en:Chambered nautilus','en:Nautilus pompilius','pt:Nautilus'],
-  'sepia-comum':['en:Common cuttlefish','en:Sepia officinalis','pt:Sepia officinalis'],
-  'polvo-dumbo':['en:Grimpoteuthis','en:Dumbo octopus','en:Cirrina'],
-  'lula-vampira':['en:Vampire squid','en:Vampyroteuthis infernalis','pt:Lula-vampira'],
-  'caranguejo-aranha-japones':['en:Japanese spider crab','en:Macrocheira kaempferi','pt:Caranguejo-aranha-japonês'],
-  'lagosta-espinhosa':['en:Caribbean spiny lobster','en:Panulirus argus','en:Spiny lobster'],
-  'krill-antartico':['en:Antarctic krill','en:Euphausia superba','pt:Krill-antártico'],
-  'isopode-gigante':['en:Bathynomus giganteus','en:Giant isopod','en:Bathynomus'],
-  'medusa-lua':['en:Aurelia aurita','en:Moon jelly','pt:Aurelia aurita'],
-  'coral-chifre-de-alce':['en:Acropora palmata','en:Elkhorn coral','pt:Acropora palmata'],
-  'estrela-do-mar-girassol':['en:Sunflower sea star','en:Pycnopodia helianthoides'],
-  'ourico-do-mar-roxo':['en:Strongylocentrotus purpuratus','en:Purple sea urchin','en:Strongylocentrotus'],
-  'porco-do-mar':['en:Scotoplanes','en:Sea pig','en:Elpidiidae'],
-  'peixe-vibora':['en:Chauliodus sloani','en:Viperfish','en:Chauliodus'],
-  'peixe-dragao':['en:Malacosteus niger','en:Stoplight loosejaw','en:Malacosteus'],
-  'verme-tubo-gigante':['en:Riftia pachyptila','en:Giant tube worm','pt:Riftia pachyptila'],
-  'prochlorococcus':['en:Prochlorococcus','pt:Prochlorococcus','en:Cyanobacteria'],
-  'diatomaceas':['pt:Diatomácea','en:Diatom','en:Bacillariophyceae'],
-  'kelp-gigante':['en:Macrocystis pyrifera','en:Giant kelp','pt:Macrocystis pyrifera'],
-  'anfipode-hadal':['en:Hirondellea gigas','en:Amphipoda','pt:Amphipoda'],
-  'peixe-gota':['en:Psychrolutes marcidus','en:Blobfish','en:Psychrolutes'],
-  'eco-reef':['pt:Recife de coral','en:Coral reef'],
-  'eco-mangrove':['pt:Manguezal','en:Mangrove'],
-  'eco-kelp':['pt:Floresta de kelp','en:Kelp forest'],
-  'eco-open':['pt:Zona pelágica','en:Pelagic zone'],
-  'eco-seabed':['en:Seabed','pt:Assoalho oceânico'],
-  'eco-vent':['pt:Fonte hidrotermal','en:Hydrothermal vent'],
-  'eco-estuary':['pt:Estuário','en:Estuary'],
-  'eco-seagrass':['en:Seagrass','pt:Erva marinha'],
-  'basin-atlantico':['pt:Oceano Atlântico','en:Atlantic Ocean'],
-  'basin-pacifico':['pt:Oceano Pacífico','en:Pacific Ocean'],
-  'basin-indico':['pt:Oceano Índico','en:Indian Ocean'],
-  'basin-artico':['pt:Oceano Ártico','en:Arctic Ocean'],
-  'basin-antartico':['pt:Oceano Antártico','en:Southern Ocean'],
-  'page-ocean':['pt:Oceano','en:Ocean'],
-  'page-deep':['en:Deep sea','pt:Zona abissal'],
-  'page-zones':['en:Pelagic zone','pt:Zona pelágica'],
-  'page-conservation':['pt:Poluição marinha','en:Marine pollution'],
-  'page-exploration':['en:Remotely operated underwater vehicle','pt:Veículo subaquático operado remotamente'],
-  'page-ecology':['pt:Ecologia marinha','en:Marine ecology'],
-  'page-food':['pt:Teia alimentar','en:Food web'],
-  'page-adapt':['pt:Bioluminescência','en:Bioluminescence'],
-  'page-species':['en:Marine life','pt:Biologia marinha'],
-  'page-curiosities':['pt:Oceanografia','en:Oceanography'],
-  'page-about':['en:Marine biology','pt:Biologia marinha'],
-  'tech-rov':['en:Remotely operated underwater vehicle','pt:Veículo subaquático operado remotamente'],
-  'tech-auv':['en:Autonomous underwater vehicle','pt:Veículo subaquático autônomo'],
-  'tech-sonar':['pt:Sonar','en:Sonar'],
-  'tech-sub':['en:Submersible','pt:Submersível','en:Deep-submergence vehicle'],
-  'tech-ctd':['en:CTD (instrument)','en:Rosette sampler','en:Oceanographic instrumentation'],
-  'tech-edna':['en:Environmental DNA','pt:DNA ambiental','en:Metagenomics'],
-  'page-timeline':['en:History of Earth','pt:História da Terra']
+/* ================= FOTOGRAFIAS REAIS ABYSSAL =================
+   Catálogo estático de fotografias reais hospedadas no Wikimedia Commons.
+   Não há chamadas de API nem dependência de resolução em tempo de execução:
+   cada foto é montada diretamente pelo redirecionador de arquivo do Commons.
+*/
+const REAL_PHOTO_FILES={
+  'tubarao-branco': 'White_shark.jpg',
+  'orca': 'Killerwhales_jumping.jpg',
+  'baleia-azul': 'Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'lula-gigante': 'Giant_squid_Ranheim.jpg',
+  'polvo-comum': 'Octopus2.jpg',
+  'cavalo-marinho': 'Hippocampus_hippocampus_(on_Ascophyllum_nodosum).jpg',
+  'tartaruga-verde': 'Green_sea_turtle_(Chelonia_mydas)_Moorea.jpg',
+  'peixe-lua': 'Mola_mola.jpg',
+  'narval': 'Нарвал_в_российской_Арктике.jpg',
+  'peixe-pescador': 'MelanocetusJohnsoniiFord.jpg',
+  'caranguejo-yeti': 'Yeti_crab.jpg',
+  'agua-viva-juba-de-leao': 'Lion\'s_mane_jellyfish_in_Gullmarn_fjord_at_Sämstad_7.jpg',
+  'tubarao-baleia': 'Similan_Dive_Center_-_great_whale_shark.jpg',
+  'tubarao-martelo': 'Scalloped_hammerhead_shark_(Sphyrna_lewini)_Costa_Rica_(cropped).jpg',
+  'tubarao-mako': 'Shortfin_mako_(Isurus_oxyrinchus).jpg',
+  'tubarao-groenlandia': 'Somniosus_microcephalus_okeanos.jpg',
+  'raia-manta': 'Manta_birostris-Thailand4.jpg',
+  'enguia-lobo': 'February_2,_2012_Wolf_Eel_(really_a_fish!)_in_Puget_Sound_(6842178290).jpg',
+  'peixe-palhaco': 'Clown_fish_in_the_Andaman_Coral_Reef.jpg',
+  'bodiao-limpador': 'Lábrido_limpiador_común_(Labroides_dimidiatus),_mar_Rojo,_Egipto,_2023-04-17,_DD_90.jpg',
+  'atum-rabilho': 'Bluefin-big.jpg',
+  'sardinha-verdadeira': 'SardinhaDSC1770.jpg',
+  'mero': 'Epinephelus_itajara_279042770.jpg',
+  'peixe-voador': 'Pink-wing_flying_fish.jpg',
+  'celacanto': 'Coelacanth_off_Pumula_on_the_KwaZulu-Natal_South_Coast,_South_Africa,_on_22_November_2019.png',
+  'peixe-lanterna': 'Myctophum_punctatum1.jpg',
+  'caracol-do-mar-hadal': 'Pseudoliparis_swirei.png',
+  'baleia-jubarte': 'Humpback_whale_breaching_off_Cabo_San_Lucas.jpg',
+  'cachalote': 'Mother_and_baby_sperm_whale.jpg',
+  'golfinho-nariz-de-garrafa': 'Tursiops_truncatus_01-cropped.jpg',
+  'foca-de-weddell': 'Mikkelsen_Harbour-2016-Trinity_Island_(D\'Hainaut_Island)–Weddell_seal_(Leptonychotes_weddellii)_03.jpg',
+  'morsa': 'Walrus_in_the_Russian_Arctic_National_Park,_Novaya_Zemlya_2015-2.jpg',
+  'tartaruga-de-couro': 'Leatherback_sea_turtle_Tinglar,_USVI_(5839996547).jpg',
+  'tartaruga-de-pente': 'Eretmochelys-imbricata-Kélonia-2.JPG',
+  'pinguim-imperador': 'Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg',
+  'albatroz-errante': 'Diomedea_exulans_-_SE_Tasmania.jpg',
+  'lula-colossal': 'NZ070415_Colossal_Squid_01.jpg',
+  'nautilo': 'Nautilus_pompilius_(detail).jpg',
+  'sepia-comum': 'Sepia_común_(Sepia_officinalis),_Parque_natural_de_la_Arrábida,_Portugal,_2020-07-21,_DD_62.jpg',
+  'polvo-dumbo': 'Dumbo-hires_(cropped).jpg',
+  'lula-vampira': 'Vampire_squid_(2111032672).jpg',
+  'caranguejo-aranha-japones': 'Macrocheira_kaempferi.jpg',
+  'lagosta-espinhosa': 'Langosta_común_del_Caribe_(Panulirus_argus),_Cozumel,_México,_2025-12-20,_DD_70.jpg',
+  'krill-antartico': 'Antarctic_krill_(Euphausia_superba).jpg',
+  'isopode-gigante': 'Laika_ac_Deep_sea_creatures_(7472073020).jpg',
+  'medusa-lua': 'Aurelia_aurita_(Cnidaria)_Luc_Viatour.jpg',
+  'coral-chifre-de-alce': 'Elkhorn_coral.jpg',
+  'estrela-do-mar-girassol': 'Pycnopodia_helianthoides_SLO_CA.jpg',
+  'ourico-do-mar-roxo': 'Fish4641_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'porco-do-mar': 'Scotoplanes_globosa1.jpg',
+  'peixe-vibora': 'Messina_Straits_Chauliodus_sloani.jpg',
+  'peixe-dragao': 'Malacosteus_niger_(black).jpg',
+  'verme-tubo-gigante': 'Campagne_HOT_-_Vers_géants_(Riftia_pachyptila)_(Ifremer_00530-64223_-_52381).jpg',
+  'prochlorococcus': 'Prochlorococcus_marinus.jpg',
+  'diatomaceas': 'Bacillaria_paxillifera.jpg',
+  'kelp-gigante': 'Giantkelp2_300.jpg',
+  'anfipode-hadal': 'Yeti_crab.jpg',
+  'peixe-gota': 'Psychrolutes_marcidus.jpg',
+  'eco-reef': 'Blue_Linckia_Starfish.JPG',
+  'eco-mangrove': 'Sonneratia_alba_-_Manado_(2).JPG',
+  'eco-kelp': 'Kelp_forest.jpg',
+  'eco-open': 'Pacific_Ocean_as_viewed_from_GOES-18_on_September_23,_2023.jpg',
+  'eco-seabed': 'Common_stingray_tenerife.jpg',
+  'eco-vent': 'Blacksmoker_in_Atlantic_Ocean.jpg',
+  'eco-estuary': 'Rio_de_la_Plata_BA_2.JPG',
+  'eco-seagrass': 'Zostera_marina_-_National_Museum_of_Nature_and_Science,_Tokyo_-_DSC07663.JPG',
+  'basin-pacifico': 'Pacific_Ocean_as_viewed_from_GOES-18_on_September_23,_2023.jpg',
+  'basin-atlantico': 'Tide_pools_in_santa_cruz.jpg',
+  'basin-indico': 'Maldivesfish2.jpg',
+  'basin-artico': 'Walrus_in_the_Russian_Arctic_National_Park,_Novaya_Zemlya_2015-2.jpg',
+  'basin-antartico': 'Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg',
+  'page-ocean': 'Pacific_Ocean_as_viewed_from_GOES-18_on_September_23,_2023.jpg',
+  'page-deep': 'Expl0511_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'page-food': 'Maldivesfish2.jpg',
+  'page-species': 'Tide_pools_in_santa_cruz.jpg',
+  'page-adapt': 'Expl0511_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'page-conservation': 'Blue_Linckia_Starfish.JPG',
+  'page-exploration': 'Expl0511_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'page-zones': 'Pacific_Ocean_as_viewed_from_GOES-18_on_September_23,_2023.jpg',
+  'page-timeline': 'Expl0511_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'page-curiosities': 'Tide_pools_in_santa_cruz.jpg',
+  'page-ecology': 'Maldivesfish2.jpg',
+  'page-about': 'Tide_pools_in_santa_cruz.jpg',
+  'tech-rov': 'Expl1196_-_Flickr_-_NOAA_Photo_Library.jpg',
+  'tech-auv': 'Blackghost.jpg',
+  'tech-sonar': 'Motte-Picquet-tugged-sonar.jpg',
+  'tech-sub': 'Bathyscaphe_Trieste_hoisted.jpg',
+  'tech-ctd': 'CTD-me-details_hg.jpg',
+  'tech-edna': 'Expl1196_-_Flickr_-_NOAA_Photo_Library.jpg',
 };
-const PHOTO_CACHE='abyssalPhotos.v2';
-const WIKI_CHUNK=40;   /* a API aceita no máximo 50 títulos por chamada */
-let PHOTOS=null,photosPending=null;
+
+const REAL_PHOTO_URLS={
+  'basin-pacifico':'https://upload.wikimedia.org/wikipedia/commons/d/db/Pacific_Ocean_as_viewed_from_GOES-18_on_September_23%2C_2023.jpg',
+  'basin-atlantico':'https://upload.wikimedia.org/wikipedia/commons/7/74/Tide_pools_in_santa_cruz.jpg',
+  'basin-indico':'https://upload.wikimedia.org/wikipedia/commons/3/35/Maldivesfish2.jpg',
+  'basin-artico':'https://upload.wikimedia.org/wikipedia/commons/8/87/Walrus_in_the_Russian_Arctic_National_Park%2C_Novaya_Zemlya_2015-2.jpg',
+  'basin-antartico':'https://upload.wikimedia.org/wikipedia/commons/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg',
+  'page-ocean':'https://upload.wikimedia.org/wikipedia/commons/d/db/Pacific_Ocean_as_viewed_from_GOES-18_on_September_23%2C_2023.jpg'
+};
+
+const PHOTO_DEFAULTS=[
+  'Pacific_Ocean_as_viewed_from_GOES-18_on_September_23,_2023.jpg',
+  'Tide_pools_in_santa_cruz.jpg',
+  'Maldivesfish2.jpg'
+];
+const PHOTO_CACHE=Object.create(null);
+const PHOTO_DIAG={erros:[],tentativas:0,resolvidas:0,total:0,origem:'Wikimedia Commons · fotografias reais'};
+
+function photoFileUrl(file,key){
+  return REAL_PHOTO_URLS[key]||'https://commons.wikimedia.org/wiki/Special:Redirect/file/'+encodeURIComponent(file);
+}
+
+function resolvePhoto(key,alt){
+  const file=REAL_PHOTO_FILES[key]||PHOTO_DEFAULTS[0];
+  if(PHOTO_CACHE[key])return Promise.resolve(PHOTO_CACHE[key]);
+  const info={
+    src:photoFileUrl(file,key),
+    pageUrl:'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(file).replace(/%20/g,'_'),
+    title:file.replace(/_/g,' '),
+    source:'Wikimedia Commons'
+  };
+  PHOTO_CACHE[key]=info;
+  PHOTO_DIAG.resolvidas=Object.keys(PHOTO_CACHE).length;
+  PHOTO_DIAG.total++;
+  return Promise.resolve(info);
+}
+
+function diagnosticoFotos(){
+  const d=PHOTO_DIAG;
+  console.log('%cABYSSAL · diagnóstico de fotografias reais','font-weight:bold');
+  console.log('  origem : Wikimedia Commons');
+  console.log('  figuras na página :',document.querySelectorAll('.photoFrame[data-photo]').length);
+  console.log('  fotografias aplicadas :',document.querySelectorAll('.photoFrame.hasPhoto').length);
+  console.log('  resolvidas :',d.resolvidas);
+  console.log('  falhas :',d.erros.length,d.erros);
+  return d;
+}
+
 function photoFrame(key,alt,fallback,cls){
-  return `<figure class="photoFrame ${cls||''}" data-photo="${esc(key)}" data-alt="${esc(alt||'')}"><div class="photoFallback">${fallback}</div></figure>`;
+  return `<figure class="photoFrame ${cls||''}" data-photo="${esc(key)}" data-alt="${esc(alt||'')}"><div class="photoFallback"><div class="realPhotoPlaceholder">Carregando fotografia real…</div></div></figure>`;
 }
-function chunk(arr,n){const out=[];for(let i=0;i<arr.length;i+=n)out.push(arr.slice(i,i+n));return out}
-async function wikiBatch(host,titles){
-  const url=`https://${host}/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail%7Cname&pithumbsize=1400&pilimit=50&titles=${encodeURIComponent(titles.join('|'))}`;
-  const r=await fetch(url);if(!r.ok)throw new Error(host);
-  const j=await r.json();const out={};
-  const norm={},red={};
-  (j.query?.normalized||[]).forEach(n=>norm[n.to]=n.from);
-  (j.query?.redirects||[]).forEach(n=>red[n.to]=n.from);
-  for(const pid in (j.query?.pages||{})){
-    const pg=j.query.pages[pid];if(!pg.thumbnail)continue;
-    const info={src:pg.thumbnail.source,w:pg.thumbnail.width,h:pg.thumbnail.height,file:pg.pageimage,host};
-    /* devolve tanto pelo título final quanto pelo título pedido */
-    out[pg.title]=info;
-    let src=pg.title;
-    if(red[src]){src=red[src];out[src]=info}
-    if(norm[src])out[norm[src]]=info;
-  }
-  return out;
-}
-async function wikiCredits(files){
-  if(!files.length)return {};
-  const url=`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=extmetadata&titles=${encodeURIComponent(files.map(f=>'File:'+f).join('|'))}`;
-  const r=await fetch(url);if(!r.ok)return {};
-  const j=await r.json();const out={};
-  for(const pid in (j.query?.pages||{})){
-    const pg=j.query.pages[pid];const md=pg.imageinfo?.[0]?.extmetadata;if(!md)continue;
-    const strip=s=>String(s||'').replace(/<[^>]*>/g,'').trim();
-    out[(pg.title||'').replace(/^File:/,'')]={
-      author:strip(md.Artist?.value)||'autor não identificado',
-      license:strip(md.LicenseShortName?.value)||'ver Commons'
-    };
-  }
-  return out;
-}
-async function loadPhotos(){
-  if(PHOTOS)return PHOTOS;
-  if(photosPending)return photosPending;
-  photosPending=(async()=>{
-    try{
-      const cached=sessionStorage.getItem(PHOTO_CACHE);
-      if(cached){const p=JSON.parse(cached);if(p&&Object.keys(p).length){PHOTOS=p;return PHOTOS}}
-    }catch{}
-    const keys=Object.keys(WIKI_TITLES),map={};
-    const rounds=Math.max(1,...keys.map(k=>WIKI_TITLES[k].length));
-    for(let round=0;round<rounds;round++){
-      const byHost={};
-      for(const k of keys){
-        if(map[k])continue;
-        const cand=WIKI_TITLES[k][round];if(!cand)continue;
-        const sep=cand.indexOf(':'),lang=cand.slice(0,sep),title=cand.slice(sep+1);
-        const host=(lang==='pt'?'pt':'en')+'.wikipedia.org';
-        (byHost[host]=byHost[host]||[]).push([k,title]);
-      }
-      for(const host in byHost){
-        for(const part of chunk(byHost[host],WIKI_CHUNK)){
-          let res;
-          try{res=await wikiBatch(host,[...new Set(part.map(p=>p[1]))])}
-          catch(err){continue}   /* um bloco falho não derruba os demais */
-          for(const[k,title]of part){const hit=res[title];if(hit&&!map[k])map[k]=hit}
-        }
-      }
-    }
-    const files=[...new Set(Object.values(map).map(v=>v.file).filter(Boolean))];
-    const credits={};
-    for(const part of chunk(files,WIKI_CHUNK)){
-      try{Object.assign(credits,await wikiCredits(part))}catch(err){}
-    }
-    Object.values(map).forEach(v=>{const c=credits[v.file];if(c){v.author=c.author;v.license=c.license}});
-    PHOTOS=map;
-    /* só guarda em cache se algo veio: assim uma falha de rede não
-       congela o atlas nas ilustrações até fechar a aba */
-    if(Object.keys(map).length){try{sessionStorage.setItem(PHOTO_CACHE,JSON.stringify(map))}catch{}}
-    return PHOTOS;
-  })();
-  return photosPending;
-}
+
+function loadPhotos(){ return Promise.resolve(PHOTO_CACHE); }
+
 function applyPhotos(){
   const frames=document.querySelectorAll('.photoFrame[data-photo]');
   if(!frames.length)return;
-  loadPhotos().then(map=>{
-    document.querySelectorAll('.photoFrame[data-photo]').forEach(f=>{
-      const info=map[f.dataset.photo];if(!info||f.dataset.done||f.dataset.loading)return;
-      f.dataset.loading='1';
-      const img=new Image();
-      img.src=info.src;img.alt=f.dataset.alt||'';img.loading='lazy';img.decoding='async';
+  frames.forEach(frame=>{
+    if(frame.dataset.done||frame.dataset.loading)return;
+    frame.dataset.loading='1';
+    resolvePhoto(frame.dataset.photo,frame.dataset.alt).then(info=>{
+      frame.dataset.loading='';
+      PHOTO_DIAG.tentativas++;
+      const img=document.createElement('img');
+      img.src=info.src;
+      img.alt=frame.dataset.alt||'Fotografia real de vida marinha';
+      img.loading='lazy';
+      img.decoding='async';
+      img.referrerPolicy='no-referrer-when-downgrade';
       img.onload=()=>{
-        f.dataset.done='1';f.classList.add('hasPhoto');
-        const cap=document.createElement('figcaption');
-        cap.innerHTML=`<span>${esc(info.author||'Wikimedia Commons')}</span> · <span>${esc(info.license||'')}</span> · <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(info.file||'')}" target="_blank" rel="noopener noreferrer">Commons</a>`;
-        f.prepend(img);f.appendChild(cap);
+        frame.dataset.done='1';
+        frame.classList.add('hasPhoto');
+        const holder=frame.querySelector('.photoFallback');
+        if(holder)holder.remove();
+        // Sem link de fonte sobre a imagem.
       };
-      img.onerror=()=>{delete f.dataset.loading};   /* mantém a ilustração */
+      img.onerror=()=>{
+        PHOTO_DIAG.erros.push({key:frame.dataset.photo,error:'Falha ao carregar a fotografia'});
+        frame.dataset.failed='1';
+        const holder=frame.querySelector('.photoFallback');
+        if(holder)holder.innerHTML='<div class="realPhotoPlaceholder">Fotografia indisponível.</div>';
+      };
+      frame.prepend(img);
     });
   });
 }
-function marineSnow(){const wrap=document.getElementById('marineSnow');if(!wrap)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){wrap.remove();return}const n=innerWidth<760?16:34;let h='';for(let i=0;i<n;i++){const s=(Math.random()*2.4+1.1).toFixed(2);h+=`<i style="left:${(Math.random()*100).toFixed(2)}%;width:${s}px;height:${s}px;animation-duration:${(Math.random()*24+20).toFixed(1)}s;animation-delay:${(-Math.random()*44).toFixed(1)}s;opacity:${(Math.random()*.3+.1).toFixed(2)}"></i>`}wrap.innerHTML=h}
+
 function art(type,size='large'){
 const cls=`svgArt ${size}`;
 const common='';
@@ -288,7 +266,7 @@ function markMap(region){const log=getLog();if(!log.map.includes(region))log.map
 const MODES={
   explorador:{name:'Exploração',short:'EXPLORAÇÃO',
     lead:'Você percorre o atlas pela imagem e pela narrativa.',
-    bullets:['Fichas ilustradas com fotografia grande','Uma curiosidade em destaque por espécie','Convites para o mapa, o jogo e o diário']},
+    bullets:['Fichas ilustradas com ilustração científica grande','Uma curiosidade em destaque por espécie','Convites para o mapa, o jogo e o diário']},
   cientista:{name:'Cientista',short:'CIENTISTA',
     lead:'Você percorre o atlas pelos números e pelas fontes.',
     bullets:['Catálogo em tabela ordenável, com faixa em metros','Código IUCN, bacias e fonte em cada linha','Notas de método e ressalvas de incerteza']}

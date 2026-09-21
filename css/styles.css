@@ -862,16 +862,16 @@ body[data-zone="hadopelagica"]{--zoneTint:var(--tx28)}
   color:var(--bio-dim);border:1px solid var(--line2);border-radius:6px;padding:11px 14px}
 .wcLink:hover{background:rgba(var(--ac21-rgb),.08);color:var(--bio)}
 
-/* ============ FOTOGRAFIAS ============ */
-.photoFrame{margin:0;display:block;position:relative}
-.photoFrame img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:3px;
+/* ============ FOTOGRAFIAS REAIS ============ */
+.photoFrame{margin:0;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.photoFrame img{display:block;width:100%;max-width:100%;aspect-ratio:4/3;object-fit:cover;object-position:50% 50%;margin:0 auto;border-radius:3px;
   border:1px solid var(--line);background:var(--sf20)}
 .photoFrame.big img{aspect-ratio:5/4}
 .photoFrame.hasPhoto .photoFallback{display:none}
 .photoFrame figcaption{margin-top:7px;font:500 8.5px/1.5 var(--mono);letter-spacing:.04em;
   color:var(--faint);display:flex;flex-wrap:wrap;gap:5px}
 .photoFrame figcaption a{color:var(--bio-dim);text-decoration:underline;text-underline-offset:2px}
-.photoFallback .svgArt{width:100%;height:auto;display:block}
+.photoFallback .svgArt{display:none}.realPhotoPlaceholder{min-height:150px;display:grid;place-items:center;padding:24px;border:1px dashed var(--line);background:var(--panel);color:var(--bio-dim);font:500 10px/1.5 var(--mono);text-align:center;text-transform:uppercase;letter-spacing:.08em}
 .speciesVisual{padding:0;border:0;background:none;margin-bottom:14px}
 .detailVisual .photoFrame img,.pageArt .photoFrame img{aspect-ratio:4/3;width:100%}
 .pageArt{min-height:auto}
@@ -943,12 +943,12 @@ body[data-zone="hadopelagica"]{--zoneTint:var(--tx28)}
 
 /* fotografias em contextos novos */
 .basinPhoto{margin-bottom:22px;border:1px solid var(--line);overflow:hidden}
-.basinPhoto .photoFrame img{aspect-ratio:16/9;display:block}
+.basinPhoto .photoFrame img{aspect-ratio:16/9;display:block;object-position:50% 50%}
 .deepLife .photoFrame{width:min(300px,44vw)}
-.deepLife .photoFrame img{aspect-ratio:4/3;border:1px solid var(--line)}
+.deepLife .photoFrame img{aspect-ratio:4/3;border:1px solid var(--line);object-position:50% 50%}
 .deepLife .photoFrame figcaption{font-size:9px}
 .techVisual .photoFrame{width:100%;height:100%}
-.techVisual .photoFrame img{width:100%;height:105px;object-fit:cover;aspect-ratio:auto;border-radius:0}
+.techVisual .photoFrame img{width:100%;height:150px;object-fit:cover;object-position:50% 50%;aspect-ratio:auto;border-radius:0;background:var(--panel);border:0;margin:0}
 .techVisual .photoFrame figcaption{display:none}
 
 /* ---------- microinterações: revelação progressiva ---------- */
@@ -1137,7 +1137,8 @@ body[data-zone="hadopelagica"]{--zoneTint:var(--tx28)}
   padding:11px 14px;border-bottom:1px solid var(--line)}
 .fcId{font:600 9px var(--mono);letter-spacing:.14em;color:var(--bio)}
 .fcVisual{height:150px;overflow:hidden;border-bottom:1px solid var(--line);background:var(--sf20)}
-.fcVisual .photoFrame{height:100%;margin:0}
+.fcVisual .photoFrame{height:100%;width:100%;margin:0}
+.fcVisual .photoFrame img{width:100%;height:150px;aspect-ratio:auto;object-fit:cover;object-position:50% 50%;border:0;border-radius:0;margin:0}
 .fieldCard h3{margin:16px 16px 2px;font:400 1.12rem/1.2 var(--serif);letter-spacing:-.01em}
 .fieldCard h3 a{color:var(--ink);text-decoration:none}
 .fieldCard h3 a:hover{color:var(--bio)}
@@ -1368,3 +1369,102 @@ html[data-theme="claro"] .themeSwitch .moonIcon{display:none}
   .themeSwitch b{display:none}
   .themeSwitch{padding:7px 9px}
 }
+
+/* imagens locais: recorta em vez de esticar quando a proporção do arquivo difere do slot */
+.photoFrame img{object-fit:cover}
+
+/* enquadramento fotográfico: assunto centralizado e sem distorção */
+.photoFrame img{width:100%;height:auto;display:block;object-fit:cover;object-position:50% 50%;background:var(--panel)}
+.speciesVisual .photoFrame img,.detailVisual .photoFrame img,.pageArt .photoFrame img{aspect-ratio:4/3;object-fit:cover;object-position:50% 50%}
+.ecoCard .ecoVisual .photoFrame img,.basinPhoto .photoFrame img{aspect-ratio:16/10;object-fit:cover;object-position:50% 50%}
+.deepLife .photoFrame img{object-fit:cover;object-position:50% 50%}
+.techVisual .photoFrame img{object-fit:cover!important;object-position:50% 50%!important;background:var(--panel)}
+
+
+/* ============================================================
+   AJUSTE GLOBAL DE ENQUADRAMENTO DAS FOTOGRAFIAS
+   Mantém proporções, evita esticar as imagens e usa áreas
+   de corte consistentes em todos os cartões e páginas.
+   ============================================================ */
+.photoFrame{
+  width:100%;
+  overflow:hidden;
+}
+
+.photoFrame img{
+  display:block;
+  width:100%;
+  max-width:100%;
+  height:auto;
+  aspect-ratio:4 / 3;
+  object-fit:cover;
+  object-position:50% 50%;
+  margin:0 auto;
+}
+
+.photoFrame.big img{
+  aspect-ratio:5 / 4;
+}
+
+.speciesVisual .photoFrame img,
+.detailVisual .photoFrame img,
+.pageArt .photoFrame img,
+.deepLife .photoFrame img{
+  width:100%;
+  aspect-ratio:4 / 3;
+  object-fit:cover;
+  object-position:50% 50%;
+}
+
+.ecoCard .ecoVisual .photoFrame img{
+  width:100%;
+  aspect-ratio:16 / 10;
+  object-fit:cover;
+  object-position:50% 50%;
+}
+
+.basinPhoto .photoFrame img{
+  width:100%;
+  aspect-ratio:16 / 9;
+  object-fit:cover;
+  object-position:50% 50%;
+}
+
+.techVisual .photoFrame img{
+  width:100%;
+  height:150px;
+  aspect-ratio:auto;
+  object-fit:cover;
+  object-position:50% 50%;
+  border:0;
+  margin:0;
+}
+
+@media (max-width:700px){
+  .photoFrame img,
+  .speciesVisual .photoFrame img,
+  .detailVisual .photoFrame img,
+  .pageArt .photoFrame img,
+  .deepLife .photoFrame img{
+    aspect-ratio:4 / 3;
+  }
+
+  .ecoCard .ecoVisual .photoFrame img{
+    aspect-ratio:16 / 10;
+  }
+
+  .basinPhoto .photoFrame img{
+    aspect-ratio:16 / 9;
+  }
+}
+
+/* Enquadramento refinado para fichas e instrumentos */
+.fcVisual .photoFrame[data-photo="peixe-lanterna"] img{object-position:50% 48%}
+.fcVisual .photoFrame[data-photo="peixe-gota"] img{object-position:50% 42%}
+.fcVisual .photoFrame[data-photo="pinguim-imperador"] img{object-position:50% 48%}
+.techVisual .photoFrame[data-photo="tech-rov"] img{object-position:50% 50%}
+.techVisual .photoFrame[data-photo="tech-auv"] img{object-position:50% 50%}
+.techVisual .photoFrame[data-photo="tech-sonar"] img{object-position:50% 50%}
+.techVisual .photoFrame[data-photo="tech-sub"] img{object-position:50% 50%}
+.techVisual .photoFrame[data-photo="tech-ctd"] img{object-position:50% 50%}
+.techVisual .photoFrame[data-photo="tech-edna"] img{object-position:50% 50%}
