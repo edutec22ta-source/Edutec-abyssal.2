@@ -1477,3 +1477,699 @@ html[data-theme="claro"] .themeSwitch .moonIcon{display:none}
 .badge.badgeOn{opacity:1;border-color:rgba(var(--ac10-rgb),.45);background:linear-gradient(180deg,rgba(var(--ac10-rgb),.09),var(--sf20))}
 .badge.badgeOn strong{color:var(--bio)}
 @media (max-width:640px){.badgeGrid{grid-template-columns:1fr}}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   CAMADA RESPONSIVA — adequação a celular e tablet
+   ────────────────────────────────────────────────────────────────────────
+   Esta camada precisa permanecer NO FIM do arquivo.
+   Motivo: várias regras-base do atlas (ex.: `.headerMain` da seção do mapa,
+   por volta da linha 433) são declaradas DEPOIS dos @media antigos. Como
+   media queries não somam especificidade, quem vem por último vence — era
+   por isso que o cabeçalho continuava com a coluna fixa de 210px no celular
+   e empurrava o botão do menu para fora da tela.
+
+   Nada aqui altera cor, conteúdo, tipografia de marca ou o tema por
+   `data-zone`: são apenas ajustes de layout, densidade e área de toque.
+
+   Índice
+     1. Fundamentos e proteção contra rolagem horizontal
+     2. Cabeçalho, menu e navegação
+     3. Tipografia fluida e legibilidade
+     4. Grades e blocos de conteúdo
+     5. Componentes com posicionamento absoluto
+     6. Formulários, botões e área de toque
+     7. Simulador de ROV (inclui controles de toque)
+     8. Rodapé e elementos flutuantes
+     9. Paisagem, telas muito estreitas e impressão
+   ════════════════════════════════════════════════════════════════════════ */
+
+
+/* ───────────────────────── 1. Fundamentos ───────────────────────── */
+
+:root{
+  --hdr-h:114px;          /* altura real do cabeçalho; ajustada por breakpoint */
+  --tap:44px;             /* área mínima de toque recomendada */
+  --gutter:6vw;
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+/* `clip` não cria contexto de rolagem — ao contrário de `hidden`, não quebra
+   `position:sticky` nem o comportamento do cabeçalho fixo. */
+body{overflow-x:clip}
+@supports not (overflow:clip){body{overflow-x:hidden}}
+
+/* Mídia nunca deve estourar o contêiner. */
+img,svg:not(.svgDefs),canvas,video,iframe,table{max-width:100%}
+
+@media(max-width:1024px){
+  /* Itens de grade/flex têm `min-width:auto` por padrão: uma palavra longa
+     alarga a coluna e cria rolagem horizontal. Era a causa do estouro de
+     198px na home. */
+  main :is(section,article,aside,div,dl,dd,ul,ol,li,figure,p,h1,h2,h3,h4,table){min-width:0}
+  main :is(p,li,dd,dt,td,th,h1,h2,h3,h4,figcaption,.lede,.subtle,.small){overflow-wrap:break-word}
+  /* Palavras técnicas longas (nomes científicos, unidades) podem hifenizar. */
+  main :is(p,.lede,.subtle){hyphens:auto}
+}
+
+
+/* ──────────────────── 2. Cabeçalho, menu e navegação ──────────────────── */
+
+@media(max-width:1100px){
+  /* Anula a coluna fixa de 210px redeclarada adiante no arquivo. */
+  .headerMain{grid-template-columns:1fr auto;gap:12px}
+  .mainNav{display:none}
+  .mobileBtn{display:flex;align-items:center;justify-content:center}
+}
+
+@media(max-width:900px){
+  :root{--hdr-h:97px}
+  body{padding-top:var(--hdr-h)}
+
+  .headerTop{
+    height:34px;
+    padding:0 max(16px,var(--safe-l)) 0 max(16px,var(--safe-r));
+    font-size:9px;
+  }
+  .headerMain{
+    height:62px;
+    padding:0 max(16px,var(--safe-r)) 0 max(16px,var(--safe-l));
+    gap:10px;
+  }
+  .brand{font-size:1.15rem;letter-spacing:.12em;line-height:1.1}
+  .brand span{font-size:7.5px;letter-spacing:.16em;margin-top:4px}
+
+  .headerTools{gap:8px}
+  .headerSearch{display:none}
+  .headerSub{top:var(--hdr-h)}
+  .meterBar{top:calc(var(--hdr-h) - 2px)}
+}
+
+@media(max-width:560px){
+  /* A faixa superior só repete a marca que já aparece logo abaixo: some,
+     devolvendo 34px de altura útil numa tela pequena. */
+  :root{--hdr-h:63px}
+  .headerTop{display:none}
+
+  .brand span{display:none}          /* mantém só “ABYSSAL” */
+  .brand{font-size:1.2rem}
+
+  /* Os três controles viram botões quadrados de 44px, só com ícone.
+     O texto sai, mas cada botão já tem `aria-label` no HTML. */
+  .headerTools{gap:6px}
+  .modeSwitch,.themeSwitch,.mobileBtn{
+    width:var(--tap);height:var(--tap);
+    padding:0;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;gap:0;
+    flex:0 0 auto;
+  }
+  .modeSwitch b,.themeSwitch b{
+    position:absolute;width:1px;height:1px;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;
+  }
+  .modeSwitch i{width:11px;height:11px}
+  .themeSwitch svg{width:19px;height:19px}
+  .headerTools .depthChip{display:none}
+}
+
+@media(max-width:1100px){
+  /* Painel do mega-menu: largura total, uma coluna e rolagem própria —
+     são 18 links, que não cabem na altura de um celular. */
+  .headerSub{
+    left:max(10px,var(--safe-l));
+    right:max(10px,var(--safe-r));
+    max-height:calc(100dvh - var(--hdr-h) - 14px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding:10px 14px 14px;
+  }
+  .headerSub.open{grid-template-columns:1fr 1fr;gap:6px}
+  .megaGroup{padding:6px 4px}
+  .megaGroup span{font-size:9.5px;display:block;margin-bottom:2px}
+  .megaGroup a{padding:11px 8px;font-size:.92rem;min-height:var(--tap);
+    display:flex;align-items:center;border-radius:8px}
+  .megaGroup a:hover{padding-left:8px}
+}
+
+@media(max-width:600px){
+  .headerSub.open{grid-template-columns:1fr;gap:2px}
+  .megaGroup+.megaGroup{border-top:1px solid var(--line);margin-top:2px;padding-top:10px}
+}
+
+/* Busca dentro do mega-menu: no celular o campo do cabeçalho some, e sem
+   isto a busca do atlas fica inacessível. Visível só quando o campo do
+   cabeçalho está escondido. */
+.megaSearch{display:none}
+@media(max-width:900px){
+  .megaSearch{
+    display:flex;align-items:center;gap:9px;
+    grid-column:1/-1;margin:2px 0 10px;
+    border:1px solid var(--line);border-radius:999px;
+    padding:0 14px;background:var(--sf20);
+    min-height:var(--tap);
+  }
+  .megaSearch svg{width:17px;height:17px;flex:0 0 auto;fill:none;
+    stroke:currentColor;stroke-width:1.7;opacity:.65}
+  .megaSearch input{
+    flex:1;min-width:0;border:0;background:none;color:var(--ink);
+    font-size:16px;              /* 16px evita o zoom automático do iOS */
+    padding:10px 0;outline:none;
+  }
+}
+
+/* O link de pular conteúdo precisa aparecer abaixo do cabeçalho fixo. */
+.skipLink:focus{top:calc(var(--hdr-h) + 8px)}
+
+
+/* ─────────────── 3. Tipografia fluida e legibilidade ─────────────── */
+
+@media(max-width:900px){
+  .display{font-size:clamp(2.4rem,10vw,4rem);letter-spacing:-.045em;line-height:.94}
+  .h2{font-size:clamp(1.85rem,6.4vw,2.9rem);letter-spacing:-.035em;line-height:1.06}
+  .lede{font-size:1rem;line-height:1.7;max-width:none}
+  .section{padding:58px var(--gutter)}
+  .section+.section:before{left:var(--gutter);right:var(--gutter)}
+  .sectionTitle{margin-bottom:28px}
+  .pageHero{padding:40px var(--gutter) 44px;gap:26px}
+}
+
+@media(max-width:600px){
+  /* Rótulos monoespaçados de 8–9,5px ficam ilegíveis no celular.
+     Sobem para ≥10,5px mantendo o mesmo desenho. */
+  .kicker{font-size:10.5px;letter-spacing:.13em}
+  .wcMeta dt,.wcMeta dd,.small,.megaGroup span,.depthChip,
+  .gameReadout,.gameStats,.atlasStat span,.specimenCard .small,
+  .modeCard .modeCardTop b,.missionStep span{font-size:10.5px}
+  .footCols a,.foot .small{font-size:.86rem}
+  h3{font-size:1.15rem}
+  .wcBody h3{font-size:1.35rem}
+}
+
+
+/* ──────────────── 4. Grades e blocos de conteúdo ──────────────── */
+
+@media(max-width:1024px){
+  .grid3,.cards,.speciesGrid,.ecosystemGrid,.fieldGrid,
+  .oClimate,.oHabitats,.oData,.quantGrid,.connectGrid,
+  .layerMeters,.basinTabs,.abyssCallouts,.gloss,.phaseList
+  {grid-template-columns:repeat(2,minmax(0,1fr))}
+
+  .grid2,.consoleGrid,.atlasConsole,.oScale,.oLayers,.oCurrents,
+  .logHero,.logGrid,.layerText,.gasRow,.specimenBand,.ecologyHero,
+  .detailBody,.pageHero,.hero,.expeditionGateway,.gamePageHero,.gameMain
+  {grid-template-columns:minmax(0,1fr)}
+
+  .grid2{gap:32px}
+  .gasRow{gap:16px}
+}
+
+@media(max-width:600px){
+  .grid3,.cards,.speciesGrid,.ecosystemGrid,.fieldGrid,
+  .oClimate,.oHabitats,.oData,.quantGrid,.connectGrid,
+  .layerMeters,.gloss,.phaseList,.modeCards,.commandLinks,
+  .detailBlocks,.mapInfo,.plateFacts,.heroFacts,.wide,
+  .specimenLinks,.fcActions,.samples,.ecologyMetrics,.badgeGrid,
+  .oScaleData,.layerQuant,.footCols
+  {grid-template-columns:minmax(0,1fr)}
+
+  /* Blocos de números continuam em 2 colunas: viram tabela de leitura
+     rápida e ficariam longos demais empilhados. */
+  .factStrip,.atlasStats,.ticker,.basinTabs,.gameReadout,.oData
+  {grid-template-columns:repeat(2,minmax(0,1fr))}
+
+  /* Bordas internas dessas grades de 2 colunas, agora que o número de
+     colunas mudou. */
+  .factStrip div,.ticker div{border-right:0;border-bottom:1px solid var(--line)}
+  .factStrip div:nth-child(odd),.ticker div:nth-child(odd){border-right:1px solid var(--line)}
+
+  .card{min-height:0;padding:20px}
+  .interaction{padding:20px;border-radius:18px}
+  .discoveryCard{padding:18px;border-radius:18px}
+  .atlasConsole{padding:18px;border-radius:18px}
+  .modeCard{padding:18px}
+  .commandLink{padding:14px;min-height:var(--tap)}
+
+  /* Coluna d’água da home: barra colorida + texto, com o link embaixo. */
+  .wcRow{grid-template-columns:8px minmax(0,1fr);gap:14px;padding-bottom:22px}
+  .wcBar{grid-row:1/3;width:8px;min-height:80px}
+  .wcLink{grid-column:2;justify-self:start;margin-top:12px;align-self:start}
+  .wcMeta{gap:14px 20px}
+  .wcBody p{max-width:none}
+
+  /* Miniaturas decorativas dentro dos cards disputam espaço com o texto. */
+  .card .miniArt{position:static;width:100%;height:96px;margin:0 0 12px;opacity:.85}
+
+  .heroActions{gap:8px}
+  .heroActions .btn{flex:1 1 auto;text-align:center}
+}
+
+
+/* ─────────── 5. Componentes com posicionamento absoluto ─────────── */
+
+@media(max-width:900px){
+  /* Hero: sem altura mínima de viewport, que gerava telas quase vazias. */
+  .hero{min-height:0;padding:44px var(--gutter) 56px;gap:30px}
+  .heroArt{min-height:0;aspect-ratio:1/.78}
+  .oceanSphere{width:min(78vw,420px)}
+  .heroDepthRuler{display:none}
+}
+
+@media(max-width:600px){
+  .heroArt{aspect-ratio:1/.72}
+  .oceanSphere{width:min(82vw,360px)}
+
+  /* /profundezas — as cotas de profundidade são linhas absolutas sobre o
+     mapa; a altura mínima cai, mas continua suficiente para elas. */
+  .abyss{min-height:0;padding:64px var(--gutter)}
+  .abyssMap{min-height:520px;margin-top:52px}
+  .deepLife{left:4%;right:4%}
+  .depthMarker{font-size:9.5px}
+  .pressureGauge{position:relative;right:auto;top:auto;width:100%;margin:32px 0 0}
+
+  /* /mapa — as bacias são botões absolutos posicionados por `left/top`
+     em %. Em `position:static` esses valores são ignorados e os cartões
+     voltam ao fluxo, um embaixo do outro, sem se sobrepor. */
+  .oceanMap{
+    min-height:0;padding:16px;display:grid;gap:10px;
+    border-radius:20px;place-items:stretch;
+  }
+  .oceanMap .mapOrbit{display:none}
+  .oceanMap .mapCenter{
+    position:static;transform:none;
+    width:auto;height:auto;min-height:130px;
+    border-radius:16px;padding:18px;
+  }
+  .oceanMap .mapNode{
+    position:static;transform:none;
+    width:auto;padding:14px 16px;
+    box-shadow:none;min-height:var(--tap);
+  }
+  .oceanMap .mapNode:hover{transform:none}
+
+  .specimenSheet{grid-template-columns:minmax(0,1fr);padding:24px var(--gutter) 0}
+}
+
+
+/* ──────────── 6. Formulários, botões e área de toque ──────────── */
+
+@media(max-width:900px){
+  /* 16px no campo evita o zoom automático do Safari iOS ao focar. */
+  input,select,textarea{font-size:16px}
+
+  input[type=search],input[type=text],input[type=email],
+  select,textarea,
+  #speciesQuery,#glossQuery{
+    min-height:var(--tap);
+    padding:11px 13px;
+    border-radius:12px;
+    width:100%;
+  }
+  select{
+    appearance:none;-webkit-appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+                     linear-gradient(135deg,currentColor 50%,transparent 50%);
+    background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;
+    background-size:5px 5px,5px 5px;
+    background-repeat:no-repeat;
+    padding-right:34px;
+  }
+  .speciesFilters,.speciesSearch{gap:10px}
+
+  /* Alvos de toque: 44px é o mínimo recomendado (WCAG 2.5.5 / HIG).
+     Só a altura mínima é imposta — mexer no `display` destes blocos
+     reorganizaria o conteúdo interno deles. */
+  .modeCard,.commandLink,.specChip,.ecoChip,.wcLink,
+  .mapNode,.phaseCard,.basinTab,.card .open{min-height:var(--tap)}
+
+  /* Estes são links de uma linha: viram faixas clicáveis de largura
+     total, o que aumenta muito o alvo sem alterar o visual. */
+  .footCols a,.megaGroup a,.zoneTabs a,.tabRow a{
+    min-height:var(--tap);
+    display:flex;align-items:center;
+  }
+
+  .btn,.gameBtn{
+    min-height:var(--tap);
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:12px 18px;
+  }
+  .ecoChip{padding:10px 14px}
+  .specChip{padding:11px 14px}
+  .brand{min-height:var(--tap);display:flex;flex-direction:column;justify-content:center}
+
+  /* Remove o “salto” de hover, que no toque fica preso depois do clique. */
+  .btn:hover,.specChip:hover,.card:hover,.interaction:hover{transform:none}
+
+  /* Listas de chips roláveis não devem cortar o último item. */
+  .gameLegend{gap:7px}
+  .gameLegend span{font-size:10px;padding:8px 10px}
+}
+
+@media(hover:none){
+  /* Sem cursor não há hover: evita estados “grudados” após o toque. */
+  a:hover,button:hover{transform:none}
+}
+
+
+/* ─────────────── 7. Simulador de ROV no celular ─────────────── */
+
+@media(max-width:1024px){
+  .gameMain{grid-template-columns:minmax(0,1fr)}
+  .gamePanel{border-left:0;border-top:1px solid var(--line);padding:20px}
+  .canvasFrame{min-height:0}
+  .gameHeader{flex-direction:column;align-items:stretch;gap:14px;padding:16px 18px}
+  .gameHeaderRight{width:100%;display:grid;gap:12px}
+  .gameHeaderBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .gameHeaderBtns .gameBtn{width:100%;justify-content:center}
+}
+
+@media(max-width:600px){
+  .gameShell,.rovGame{border-radius:18px}
+  .gameStageSection{padding-left:0;padding-right:0}
+  .gameShell{border-radius:0;border-left:0;border-right:0}
+  .gameReadout{gap:8px}
+  .gameReadout span{display:flex;flex-direction:column;gap:2px}
+  .rovGame .gameBottom{flex-direction:column;align-items:stretch}
+  .rovGame .gameBottom .btn{width:100%}
+}
+
+/* O canvas do ROV tem proporção fixa; em pé numa tela estreita ele fica
+   baixo demais para pilotar. Passa a ocupar uma proporção mais alta. */
+@media(max-width:600px){
+  #rovCanvas{width:100%;height:auto;display:block}
+}
+
+/* --- Controles de toque (injetados por js/mobile.js) ---
+   O jogo original só respondia a teclado, o que o tornava injogável em
+   celular. Os controles abaixo apenas alimentam `rovState.keys`, então a
+   física e as regras da simulação permanecem exatamente as mesmas. */
+/* Em pé, o canvas tem só ~218px de altura num aparelho de 390px (a arte é
+   desenhada num espaço fixo de 1200×670). Sobrepor o manche ali cobriria a
+   cena, então os controles ganham uma faixa própria logo abaixo. Deitado ou
+   em tela cheia sobra altura, e aí eles voltam a flutuar sobre o canvas. */
+.rovTouch{
+  position:relative;
+  display:none;
+  justify-content:space-between;align-items:center;gap:10px;
+  padding:14px max(14px,var(--safe-r)) calc(14px + var(--safe-b)) max(14px,var(--safe-l));
+  background:linear-gradient(180deg,var(--sf20),var(--sf25));
+  border-top:1px solid var(--line);
+  pointer-events:none;
+  z-index:8;
+  touch-action:none;
+}
+body.rovTouchOn .rovTouch{display:flex}
+
+@media(orientation:landscape) and (max-height:600px){
+  body.rovTouchOn .rovTouch{
+    position:absolute;left:0;right:0;bottom:0;
+    align-items:flex-end;
+    background:none;border-top:0;
+  }
+  /* Deitado, a proporção 1200×670 deixaria o canvas mais alto que a tela
+     (471px de altura num aparelho de 390px), jogando os controles para
+     fora da viewport. Limitando pela altura, a cena inteira e o manche
+     cabem juntos — `object-fit:contain` preserva o desenho, como já é
+     feito nas regras de tela cheia da folha. */
+  .canvasFrame canvas{
+    height:calc(100dvh - var(--hdr-h) - 8px);
+    max-height:calc(100dvh - var(--hdr-h) - 8px);
+    width:100%;object-fit:contain;aspect-ratio:auto;
+  }
+}
+/* `startROVGame()` chama `enterGameFullscreen()`, que coloca o
+   `documentElement` inteiro em tela cheia — não o canvas. A folha já trata
+   isso com `html:fullscreen #rovGame`, mas naquele layout o console lateral
+   e o rodapé dividem os 100vh com a cena; no celular, onde a grade cai para
+   uma coluna, sobravam poucas dezenas de pixels para o canvas.
+   Em tela cheia num aparelho pequeno, a tela inteira passa a ser a cena, com
+   o cabeçalho da missão no topo e os controles sobrepostos. Os dados do
+   console continuam acessíveis ao sair da tela cheia. */
+@media(max-width:1024px){
+  html:fullscreen #rovGame .gameMain{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  html:fullscreen #rovGame .gamePanel,
+  html:fullscreen #rovGame .gameFooter{display:none}
+  html:fullscreen #rovGame .canvasFrame{height:100%;min-height:0}
+  html:fullscreen #rovGame .canvasFrame canvas{height:100%;width:100%;object-fit:contain;aspect-ratio:auto}
+  html:fullscreen #rovGame .gameHeader{padding:8px 14px;gap:8px}
+  html:fullscreen #rovGame .gameHeaderBtns{grid-template-columns:1fr 1fr}
+  html:fullscreen .rovTouch{
+    position:absolute;left:0;right:0;bottom:0;
+    align-items:flex-end;background:none;border-top:0;
+  }
+  html:fullscreen .rovTouchHint{display:none}
+}
+
+.rovStick{
+  position:relative;
+  width:124px;height:124px;border-radius:50%;
+  border:1px solid rgba(var(--ac12-rgb),.34);
+  background:radial-gradient(circle at 50% 50%,rgba(var(--sf18-rgb),.62),rgba(var(--sf25-rgb),.42));
+  backdrop-filter:blur(6px);
+  pointer-events:auto;
+  touch-action:none;
+  flex:0 0 auto;
+}
+.rovStick:before{
+  content:'';position:absolute;inset:26%;
+  border:1px dashed rgba(var(--ac12-rgb),.22);border-radius:50%;
+}
+.rovStickKnob{
+  position:absolute;left:50%;top:50%;
+  width:52px;height:52px;margin:-26px 0 0 -26px;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,rgba(var(--ac10-rgb),.9),rgba(var(--ac12-rgb),.55));
+  box-shadow:0 6px 18px rgba(0,0,0,.45);
+  transition:transform .08s linear;
+  pointer-events:none;
+}
+.rovStick[data-active="1"] .rovStickKnob{transition:none}
+
+.rovTouchBtns{display:flex;gap:10px;align-items:center;pointer-events:none;flex:0 0 auto}
+@media(orientation:landscape) and (max-height:600px){
+  .rovTouchBtns{flex-direction:column;align-items:flex-end}
+}
+.rovTouchBtn{
+  pointer-events:auto;touch-action:none;
+  width:64px;height:64px;border-radius:50%;
+  border:1px solid rgba(var(--ac12-rgb),.34);
+  background:rgba(var(--sf18-rgb),.66);
+  backdrop-filter:blur(6px);
+  color:var(--ac2);
+  font:700 9px/1.15 ui-monospace,monospace;letter-spacing:.1em;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:4px;
+}
+.rovTouchBtn[data-on="1"]{
+  background:rgba(var(--ac12-rgb),.28);
+  border-color:rgba(var(--ac12-rgb),.7);
+  color:var(--ac1);
+}
+.rovTouchBtn:disabled{opacity:.4}
+.rovTouchHint{
+  pointer-events:none;
+  flex:1 1 auto;min-width:0;
+  font:600 9.5px/1.45 ui-monospace,monospace;letter-spacing:.06em;
+  color:var(--md3);text-align:center;
+  padding:0 6px;margin:0;
+  text-transform:uppercase;
+}
+@media(orientation:landscape) and (max-height:600px){
+  .rovTouchHint{display:none}   /* deitado o espaço é do canvas */
+}
+@media(max-width:380px){
+  .rovStick{width:104px;height:104px}
+  .rovStickKnob{width:44px;height:44px;margin:-22px 0 0 -22px}
+  .rovTouchBtn{width:56px;height:56px;font-size:8.5px}
+}
+
+
+/* ───────────── 8. Rodapé e elementos flutuantes ───────────── */
+
+@media(max-width:900px){
+  .foot{grid-template-columns:minmax(0,1fr);gap:30px;
+    padding:46px var(--gutter) calc(26px + var(--safe-b))}
+}
+
+@media(max-width:600px){
+  /* `.top` e `.toast` ocupavam exatamente a mesma posição e se sobrepunham. */
+  .top{
+    right:max(14px,var(--safe-r));
+    bottom:calc(14px + var(--safe-b));
+    width:var(--tap);height:var(--tap);
+  }
+  .toast{
+    left:max(14px,var(--safe-l));
+    right:calc(var(--tap) + 24px + max(14px,var(--safe-r)));
+    bottom:calc(14px + var(--safe-b));
+    text-align:center;
+  }
+  .depthRail{display:none}
+}
+
+
+/* ────────── 9. Paisagem, telas estreitas e impressão ────────── */
+
+/* Celular deitado: o cabeçalho de 97px come quase um terço da altura. */
+@media(max-height:520px) and (orientation:landscape){
+  :root{--hdr-h:56px}
+  .headerTop{display:none}
+  .headerMain{height:55px}
+  .brand span{display:none}
+  .hero{min-height:0;padding:28px var(--gutter) 34px}
+  .heroArt{aspect-ratio:2/1}
+  .section{padding:40px var(--gutter)}
+  .headerSub{max-height:calc(100dvh - var(--hdr-h) - 10px)}
+  .rovStick{width:96px;height:96px}
+  .rovStickKnob{width:40px;height:40px;margin:-20px 0 0 -20px}
+  .rovTouchBtn{width:52px;height:52px}
+}
+
+/* Telas muito estreitas (≤360px: iPhone SE, Galaxy A0x). */
+@media(max-width:360px){
+  :root{--gutter:18px}
+  .display{font-size:clamp(2.1rem,10.5vw,2.8rem)}
+  .h2{font-size:clamp(1.65rem,7vw,2.2rem)}
+  .brand{font-size:1.08rem;letter-spacing:.1em}
+  .headerTools{gap:4px}
+  .modeSwitch,.themeSwitch,.mobileBtn{width:42px;height:42px}
+  .factStrip,.atlasStats,.ticker,.basinTabs{grid-template-columns:minmax(0,1fr)}
+  .factStrip div:nth-child(odd),.ticker div:nth-child(odd){border-right:0}
+  .gameHeaderBtns{grid-template-columns:1fr}
+}
+
+@media print{
+  .header,.meterBar,.depthRail,.top,.toast,.ambient,.rovTouch,.skipLink{display:none!important}
+  body{padding-top:0;background:#fff;color:#000}
+  .section{padding:18px 0}
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   CORREÇÃO — texto ilegível nas “placas noturnas” do TEMA CLARO
+   ────────────────────────────────────────────────────────────────────────
+   Bug pré-existente, também presente no desktop, mas que aparecia sempre no
+   celular: muitos aparelhos vêm em modo claro, e `js/theme.js` segue
+   `prefers-color-scheme`, então o atlas abria no tema claro por padrão.
+
+   As placas noturnas (.hero, .abyss, .oceanMap, .gameShell…) repõem a
+   paleta escura redefinindo as 155 variáveis primitivas (--sf*, --ac*,
+   --tx*, --md*). Só que os tokens DERIVADOS — `--ink:var(--ac1)` e outros
+   21 — são declarados em `:root`. Uma custom property é resolvida no ponto
+   em que é DECLARADA, não onde é usada: `--ink` continuava valendo o
+   `--ac1` claro do `:root`, e o texto saía quase preto sobre fundo quase
+   preto (título ABYSSAL e botões do hero ficavam invisíveis).
+
+   A correção repete os mesmos 22 tokens derivados dentro das placas, para
+   que recalculem a partir das primitivas escuras que a placa já define.
+   Nenhum valor novo é inventado: são as definições do próprio `:root`.
+   ════════════════════════════════════════════════════════════════════════ */
+
+html[data-theme="claro"] .hero,
+html[data-theme="claro"] .depthBand,
+html[data-theme="claro"] .abyss,
+html[data-theme="claro"] .oceanMap,
+html[data-theme="claro"] .layerColumn,
+html[data-theme="claro"] .gameShell,
+html[data-theme="claro"] .rovGame,
+html[data-theme="claro"] .rovHeroArt,
+html[data-theme="claro"] .gameHeroVisual,
+html[data-theme="claro"] .photoFallback{
+  --abyss:var(--sf25);
+  --deep:var(--sf20);
+  --bg:var(--sf22);
+  --bg2:var(--sf16);
+  --panel:var(--sf14);
+  --panel2:var(--sf11);
+  --ink:var(--tx1);
+  --muted:var(--tx16);
+  --faint:var(--md3);
+  --bio:var(--ac21);
+  --bio-dim:var(--ac35);
+  --water:var(--ac27);
+  --deepwater:var(--md18);
+  --coral:var(--ac25);
+  --sediment:var(--tx14);
+  --warn:var(--ac15);
+  --danger:var(--ac23);
+  --cyan:var(--ac21);
+  --cyan2:var(--ac27);
+  --accent:var(--ac21);
+  --line:rgba(var(--ac21-rgb),.14);
+  --line2:rgba(var(--ac27-rgb),.22);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   CAMADA RESPONSIVA — acabamento
+   Alvos de toque e rótulos que só aparecem em páginas internas (fichas de
+   espécie, abas de zona, trilhas de navegação, estatísticas de bacia).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* O padding do corpo passa a seguir a altura medida do cabeçalho em
+   qualquer largura — js/mobile.js mantém `--hdr-h` atualizado, e o valor
+   declarado em `:root` serve de reserva caso o script não rode. */
+body{padding-top:var(--hdr-h)}
+
+@media(max-width:900px){
+  /* Abas de zona: a folha estilizava `.tabs button`, mas a marcação usa
+     âncoras — elas ficavam com 19px de altura. */
+  .tabs a{
+    display:inline-flex;align-items:center;
+    min-height:var(--tap);padding:8px 14px;
+    border:1px solid var(--line);border-radius:999px;
+    background:var(--sf22);color:var(--tx23);font-size:.82rem;
+  }
+  .tabs a.active{background:var(--sf6);color:var(--ac2);border-color:rgba(var(--ac12-rgb),.35)}
+
+  /* Trilha de navegação e migalhas de pão. */
+  .flowTrail a{display:inline-flex;align-items:center;min-height:var(--tap);padding:6px 12px}
+  .crumbs{gap:4px 10px}
+  .crumbs a{display:inline-flex;align-items:center;min-height:38px;padding:4px 2px}
+
+  /* “Abrir ficha”, “Ver todas as espécies”, “Abrir ecossistema →”.
+     Escopo em `main` porque `.open` também é o estado aberto do
+     mega-menu (`.headerSub.open`), que não pode virar flex. */
+  main .open{display:inline-flex;align-items:center;min-height:var(--tap)}
+  .fcActions a,.fcActions button{min-height:var(--tap)}
+
+  /* Título da ficha é link: sobe para ≥24px sem alterar o espaçamento
+     do card (mínimo da WCAG 2.5.8 para alvos não embutidos em texto). */
+  main h3>a{display:inline-block;padding:3px 0}
+
+  /* Qualquer campo de formulário, inclusive os sem `type` declarado
+     (era o caso de #globalSearch, com 21px de altura). */
+  main input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),
+  main select,main textarea{min-height:var(--tap)}
+}
+
+@media(max-width:600px){
+  /* Rótulos monoespaçados de 8–9,5px. Subem para 10–10,5px: continuam
+     sendo microtipografia, mas deixam de ser ilegíveis num celular.
+     Os números grandes (dt de .heroFacts) não são tocados. */
+  .fcRows dt,.specimenCard dt,.plateFacts dt,.wcMeta dt,
+  .basinFacts dt,.basinQuant dt,.layerQuant dt{font-size:10px}
+
+  .oStatLabel,.fcId,.metric span,.card .index,
+  .iucn b,.iucn>span,.speciesCount,.eyebrowRow .speciesCount,
+  .crumbs,.realPhotoPlaceholder,
+  .basinTabs button span,.basinCurio b,.depthProfile figcaption{font-size:10.5px}
+
+  /* Com a fonte maior, o rótulo precisa poder quebrar em vez de empurrar
+     o valor para fora da linha. */
+  .fcRows div{flex-wrap:wrap}
+  .fcRows dt{flex:0 1 auto}
+
+  /* Linha de título + contador: lado a lado, o texto ficava espremido em
+     meia largura (visível no catálogo de espécies). */
+  .eyebrowRow{flex-direction:column;align-items:flex-start;gap:10px}
+  .eyebrowRow .speciesCount{text-align:left}
+}
