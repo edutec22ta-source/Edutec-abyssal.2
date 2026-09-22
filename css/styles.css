@@ -1696,6 +1696,7 @@ img,svg:not(.svgDefs),canvas,video,iframe,table{max-width:100%}
   .oClimate,.oHabitats,.oData,.quantGrid,.connectGrid,
   .layerMeters,.gloss,.phaseList,.modeCards,.commandLinks,
   .detailBlocks,.mapInfo,.plateFacts,.heroFacts,.wide,
+  .abyssCallouts,.gameBrief,
   .specimenLinks,.fcActions,.samples,.ecologyMetrics,.badgeGrid,
   .oScaleData,.layerQuant,.footCols
   {grid-template-columns:minmax(0,1fr)}
@@ -1746,12 +1747,33 @@ img,svg:not(.svgDefs),canvas,video,iframe,table{max-width:100%}
   .heroArt{aspect-ratio:1/.72}
   .oceanSphere{width:min(82vw,360px)}
 
-  /* /profundezas — as cotas de profundidade são linhas absolutas sobre o
-     mapa; a altura mínima cai, mas continua suficiente para elas. */
+  /* /profundezas — o mapa é um diagrama de profundidade: as cotas e as
+     criaturas são blocos absolutos posicionados por `top` em %. Numa tela
+     estreita eles se sobrepunham (os blocos têm ~158px e as cotas ficavam
+     a 78px umas das outras), e as fotos cobriam os rótulos de metragem.
+     Como as criaturas ficam a apenas 4% de distância das cotas, nenhuma
+     altura de mapa resolve a colisão — a saída é dar faixas horizontais
+     separadas: escala à esquerda, criaturas à direita. Continua robusto
+     se novas cotas ou criaturas forem acrescentadas. */
   .abyss{min-height:0;padding:64px var(--gutter)}
-  .abyssMap{min-height:520px;margin-top:52px}
-  .deepLife{left:4%;right:4%}
-  .depthMarker{font-size:9.5px}
+  .abyssMap{min-height:760px;margin-top:52px}
+  .abyssMap .depthMarker{right:52%;font-size:9.5px;line-height:1.45}
+  .abyssMap .deepLife{left:52%;right:0}
+  /* `.deepLife` é um flex centralizado: na faixa estreita a moldura
+     encolhia para 66px enquanto o conteúdo pedia 129px, cortando a
+     ilustração. Em bloco, ela ocupa a faixa inteira. */
+  .abyssMap .deepLife{display:block}
+  .abyssMap .deepLife .photoFrame,
+  .abyssMap .deepLife .photoFallback,
+  .abyssMap .deepLife .realPhotoPlaceholder,
+  .abyssMap .deepLife .bubble{width:100%;max-width:100%;min-width:0}
+  .abyssMap .deepLife .realPhotoPlaceholder{min-height:80px}
+  .abyssMap .deepLife small{font-size:9.5px;line-height:1.4}
+
+  /* O placeholder de 150px é grande para um celular e estourava molduras
+     baixas, como a faixa visual dos cartões de tecnologia em /exploracao. */
+  .realPhotoPlaceholder{min-height:92px;padding:14px}
+  .techVisual{height:auto;min-height:105px}
   .pressureGauge{position:relative;right:auto;top:auto;width:100%;margin:32px 0 0}
 
   /* /mapa — as bacias são botões absolutos posicionados por `left/top`
@@ -2172,4 +2194,32 @@ body{padding-top:var(--hdr-h)}
      meia largura (visível no catálogo de espécies). */
   .eyebrowRow{flex-direction:column;align-items:flex-start;gap:10px}
   .eyebrowRow .speciesCount{text-align:left}
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CORREÇÃO — moldura de foto vazia enquanto a imagem não carrega
+   ────────────────────────────────────────────────────────────────────────
+   `applyPhotos()` insere o <img> na moldura e só marca `.hasPhoto` no
+   `onload`; no `onerror` troca o texto do fallback mas mantém o <img>
+   quebrado no DOM. Como `.photoFrame img` reserva `aspect-ratio:4/3`, a
+   moldura passava a somar a imagem vazia (256px) MAIS o fallback (156px),
+   estourando o contêiner — em /oceano chegava a cortar 263px de conteúdo,
+   e o placeholder se sobrepunha a títulos e links das páginas de espécies,
+   profundezas e exploração. No celular isso custava uma tela inteira.
+
+   Enquanto não há foto, a imagem apenas deixa de ocupar altura. Quando o
+   `onload` acrescenta `.hasPhoto`, a regra para de valer e a foto assume
+   seu quadro 4:3 normalmente.
+
+   ATENÇÃO: não troque isto por `display:none`. Os <img> usam
+   `loading="lazy"`, e um elemento sem caixa nunca é observado pelo
+   navegador — testado: com `display:none` a foto não carrega nunca, nem
+   ao rolar até ela. `height:0` preserva o carregamento.
+   ════════════════════════════════════════════════════════════════════════ */
+.photoFrame:not(.hasPhoto) img{
+  height:0;
+  min-height:0;
+  aspect-ratio:auto;
+  border:0;
+  margin:0;
 }
