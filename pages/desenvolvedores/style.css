@@ -55,3 +55,19 @@
   background:radial-gradient(120% 90% at 50% 12%,rgba(var(--ac27-rgb),.12),transparent 68%);
 }
 .devHeroSvg{display:block;width:100%;height:100%}
+
+/* Selo de liderança — mesma linguagem dos rótulos monoespaçados do atlas. */
+.devLead{
+  align-self:flex-start;margin-top:7px;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:999px;
+  border:1px solid rgba(var(--ac21-rgb),.45);
+  background:rgba(var(--ac21-rgb),.10);
+  color:var(--bio);
+  font:600 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;
+}
+.devLead:before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--bio);box-shadow:0 0 9px var(--bio);
+}
+.devCard.isLead{border-color:rgba(var(--ac21-rgb),.38)}
