@@ -1756,7 +1756,7 @@ img,svg:not(.svgDefs),canvas,video,iframe,table{max-width:100%}
      separadas: escala à esquerda, criaturas à direita. Continua robusto
      se novas cotas ou criaturas forem acrescentadas. */
   .abyss{min-height:0;padding:64px var(--gutter)}
-  .abyssMap{min-height:760px;margin-top:52px}
+  .abyssMap{min-height:880px;margin-top:52px}
   .abyssMap .depthMarker{right:52%;font-size:9.5px;line-height:1.45}
   .abyssMap .deepLife{left:52%;right:0}
   /* `.deepLife` é um flex centralizado: na faixa estreita a moldura
@@ -2222,4 +2222,71 @@ body{padding-top:var(--hdr-h)}
   aspect-ratio:auto;
   border:0;
   margin:0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CORREÇÃO — layout quando as FOTOGRAFIAS REAIS carregam
+   ────────────────────────────────────────────────────────────────────────
+   As correções anteriores foram validadas com as fotos indisponíveis (o
+   ambiente de teste não alcança o Wikimedia Commons). Com as imagens
+   carregando, `.hasPhoto` entra e as molduras assumem `aspect-ratio:4/3`,
+   o que revela três problemas que o estado de placeholder escondia.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Faixas visuais de altura fixa — cartões de ecossistema (.habVisual,
+      150px) e de tecnologia (.techVisual, 105px). A foto entrava com 4:3
+      (256px) e a faixa cortava fora 107px, sempre pela base: o assunto da
+      imagem ficava pela metade. Agora a foto preenche exatamente a faixa e
+      `object-fit:cover` recorta pelo centro, como uma tarja deve fazer. */
+.habVisual .photoFrame,
+.techVisual .photoFrame{height:100%;min-height:0}
+.habVisual .photoFrame img,
+.techVisual .photoFrame img{
+  width:100%;height:100%;
+  aspect-ratio:auto;
+  object-fit:cover;object-position:50% 50%;
+}
+
+/* 2. /profundezas em telas médias e grandes. As criaturas são posicionadas
+      por `top` em % (28, 52, 73) — distam 24% e 21% entre si. Com foto de
+      300px de largura o bloco passa de 245px de altura, e num mapa de 680px
+      esses 21% valem 143px: as três fotos se empilhavam umas sobre as
+      outras, no meio do diagrama, longe das suas legendas.
+      A solução é a mesma já usada no celular: as criaturas ganham uma faixa
+      própria à direita, com a foto dimensionada para caber no intervalo, e
+      o mapa recebe altura suficiente. As cotas seguem atravessando o
+      diagrama, com a metragem à esquerda. */
+@media(min-width:601px){
+  .abyssMap{min-height:1080px}
+  .abyssMap .deepLife{
+    left:auto;right:7%;
+    width:min(240px,26%);
+    display:block;text-align:center;
+  }
+  .abyssMap .deepLife .photoFrame{width:100%;margin:0 auto}
+  .abyssMap .deepLife .photoFrame img{aspect-ratio:4/3}
+  .abyssMap .deepLife small{margin-top:8px}
+}
+
+/* A esfera do hero é `width:min(46vw,610px)`, mas a coluna direita da grade
+   mede ~543px em 1440px de tela. Só limitar a esfera não bastava: itens de
+   grade têm `min-width:auto`, então era a COLUNA que esticava até 610px para
+   acomodá-la, empurrando 5px para fora da janela e criando rolagem
+   horizontal no desktop. A regra de `min-width:0` da camada responsiva só
+   vale até 1024px, então o hero precisa da sua, em qualquer largura. */
+.hero>*{min-width:0}
+.oceanSphere{max-width:100%}
+
+/* `.heroArt` é uma grade de coluna `auto`: a coluna se dimensionava pela
+   própria esfera, então `max-width:100%` resolvia contra ela mesma e nunca
+   limitava nada. Com a coluna em `minmax(0,1fr)` o teto passa a valer. */
+.heroArt{grid-template-columns:minmax(0,1fr)}
+
+/* Mesmo caso do `.headerMain`: existe um `.hero` de nível base declarado
+   DEPOIS do @media de 1100px, então entre 1025 e 1100px o hero voltava a
+   duas colunas contra a intenção do CSS original e estourava 60px para
+   fora da janela. Restabelecido aqui, no fim do arquivo. */
+@media(max-width:1100px){
+  .hero,.pageHero,.ecologyHero,.detailBody{grid-template-columns:minmax(0,1fr)}
+  .hero>*,.pageHero>*,.ecologyHero>*,.detailBody>*{min-width:0}
 }
